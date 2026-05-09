@@ -15,7 +15,7 @@ systemctl enable redis-server
 systemctl start redis-server
 
 # Install PostgreSQL client (database runs separately or on this instance)
-apt-get install -y postgresql-client-15
+apt-get install -y postgresql-client
 
 # Install PM2 for Node.js process management (if needed for auxiliaries)
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
@@ -28,14 +28,21 @@ if [ -z "${repo_clone_url}" ]; then
   exit 1
 fi
 
+# Disable interactive git prompts
+export GIT_TERMINAL_PROMPT=0
+
 cd /opt
 if [ ! -d promptledger ]; then
-  git clone "${repo_clone_url}" promptledger
+  echo "Cloning repository from ${repo_clone_url}..." | tee -a /var/log/user-data.log
+  timeout 60 git clone "${repo_clone_url}" promptledger 2>&1 | tee -a /var/log/user-data.log || {
+    echo "Failed to clone repository. Checking if public clone works..." | tee -a /var/log/user-data.log
+    timeout 60 git clone --depth 1 "${repo_clone_url}" promptledger 2>&1 | tee -a /var/log/user-data.log || exit 1
+  }
 else
-  cd promptledger && git pull origin main
+  cd promptledger && git pull origin main 2>&1 | tee -a /var/log/user-data.log
 fi
 
-cd promptledger/backend
+cd /opt/promptledger/backend
 
 # Create Python virtual environment
 python3 -m venv venv

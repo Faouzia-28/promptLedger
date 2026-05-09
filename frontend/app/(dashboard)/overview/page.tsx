@@ -90,12 +90,12 @@ export default function OverviewPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button asChild>
-                <Link href="/units">Create First Unit</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/audit">Open Audit Log</Link>
-              </Button>
+              <Link href="/units" className="inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 h-8 gap-1.5 px-2.5 bg-primary text-primary-foreground hover:bg-primary/80">
+                Create First Unit
+              </Link>
+              <Link href="/audit" className="inline-flex shrink-0 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 h-8 gap-1.5 px-2.5 hover:bg-muted hover:text-foreground">
+                Open Audit Log
+              </Link>
             </div>
           </div>
         </Card>

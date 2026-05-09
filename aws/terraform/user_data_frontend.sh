@@ -22,14 +22,21 @@ if [ -z "${repo_clone_url}" ]; then
   exit 1
 fi
 
+# Disable interactive git prompts
+export GIT_TERMINAL_PROMPT=0
+
 cd /opt
 if [ ! -d promptledger ]; then
-  git clone "${repo_clone_url}" promptledger
+  echo "Cloning repository from ${repo_clone_url}..." | tee -a /var/log/user-data.log
+  timeout 60 git clone "${repo_clone_url}" promptledger 2>&1 | tee -a /var/log/user-data.log || {
+    echo "Failed to clone repository. Retrying with shallow clone..." | tee -a /var/log/user-data.log
+    timeout 60 git clone --depth 1 "${repo_clone_url}" promptledger 2>&1 | tee -a /var/log/user-data.log || exit 1
+  }
 else
-  cd promptledger && git pull origin main
+  cd promptledger && git pull origin main 2>&1 | tee -a /var/log/user-data.log
 fi
 
-cd promptledger/frontend
+cd /opt/promptledger/frontend
 
 # Install dependencies
 npm ci --prefer-offline --no-audit
@@ -37,11 +44,25 @@ npm ci --prefer-offline --no-audit
 # Build Next.js app
 NEXT_PUBLIC_API_URL="http://${backend_url}/api/v1" npm run build
 
-# Start with PM2
-pm2 start "npm start" --name "promptledger-frontend" --error /var/log/frontend-error.log --output /var/log/frontend.log
+# Create a systemd service so the frontend stays up after cloud-init exits
+cat > /etc/systemd/system/promptledger-frontend.service << EOF
+[Unit]
+Description=PromptLedger Frontend
+After=network.target
 
-# Save PM2 process list
-pm2 save
-pm2 startup
+[Service]
+Type=simple
+WorkingDirectory=/opt/promptledger/frontend
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run start -- --hostname 0.0.0.0 --port 3000
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now promptledger-frontend
 
 echo "Frontend init completed at $(date)" >> /var/log/user-data.log
