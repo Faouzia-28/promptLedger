@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "promptledger"
+version = "0.1.0"
+description = "PromptLedger CLI and SDK"
+requires-python = ">=3.11"
+dependencies = ["click", "rich", "httpx", "pyyaml"]
+
+[project.scripts]
+promptledger = "promptledger.cli:main"

@@ -1,0 +1,51 @@
+{
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "llm_provider": "gemini",
+      "version": "1.0.0"
+    }
+  },
+  "register": {
+    "status": 200,
+    "user_id": "31415e48-47df-4f63-8fc0-01770aa8d0e0",
+    "org_id": "98d93a8e-d167-4920-bb87-c8fa42cfb71d"
+  },
+  "login": {
+    "status": 200
+  },
+  "create_unit": {
+    "status": 200,
+    "unit_id": "9f264112-f989-4dcf-9bb9-2c22be675046"
+  },
+  "create_v1": {
+    "status": 200,
+    "version_id": "fb8b067f-4837-4a29-9104-2c84ec82db38"
+  },
+  "create_v2": {
+    "status": 200,
+    "version_id": "ab7cd5c8-b8d6-4c76-b0f2-bd30ecdd34d3"
+  },
+  "create_eval_set": {
+    "status": 200,
+    "eval_set_id": "ef83ed2b-3504-42c4-92bf-f3398ddbf7d1"
+  },
+  "diff": {
+    "status": 200,
+    "has_semantic_diff": true
+  },
+  "create_eval_run": {
+    "status": 200,
+    "run_id": "5a5a53d0-7ada-4767-b7ed-a9344ff74b38"
+  },
+  "audit_log": {
+    "status": 200,
+    "count": 1
+  },
+  "export_json": {
+    "status": 200,
+    "format": "json",
+    "has_payload": true
+  }
+}
