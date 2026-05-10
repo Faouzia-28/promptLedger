@@ -1,0 +1,105 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: promptledger-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: promptledger-api
+    ports:
+      - '8000:8000'
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      JWT_EXPIRATION_HOURS: 24
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST:-logs}
+      ELASTICSEARCH_PORT: 9200
+      LOGSTASH_HOST: ${LOGSTASH_HOST:-logs}
+      LOGSTASH_PORT: 5000
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-xxxxx}
+      PROMETHEUS_ENABLED: 'true'
+      ENABLE_REDIS_RATE_LIMITING: 'true'
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: promptledger-celery-worker
+    command: celery -A app.workers.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST:-logs}
+      ELASTICSEARCH_PORT: 9200
+      LOGSTASH_HOST: ${LOGSTASH_HOST:-logs}
+      LOGSTASH_PORT: 5000
+    depends_on:
+      - redis
+      - api
+    restart: always
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: promptledger-celery-beat
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST:-logs}
+      ELASTICSEARCH_PORT: 9200
+      LOGSTASH_HOST: ${LOGSTASH_HOST:-logs}
+      LOGSTASH_PORT: 5000
+    depends_on:
+      - redis
+      - api
+    restart: always
+
+volumes:
+  redis_data:

@@ -355,8 +355,8 @@ resource "aws_instance" "backend" {
 
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = base64encode(templatefile("${path.module}/user_data_backend.sh", {
-    logs_url             = "http://${aws_eip.logs.public_ip}:9200"
+  user_data = base64encode(templatefile("${path.module}/user_data_backend_docker.sh", {
+    logs_host            = aws_eip.logs.public_ip
     s3_bucket_name       = aws_s3_bucket.uploads.id
     aws_region           = var.aws_region
     github_client_id     = var.github_client_id
@@ -383,7 +383,9 @@ resource "aws_instance" "logs" {
 
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = base64encode(file("${path.module}/user_data_logs.sh"))
+  user_data = base64encode(templatefile("${path.module}/user_data_logs_docker.sh", {
+    repo_clone_url = var.repo_clone_url
+  }))
 
   tags = {
     Name = "${var.project_name}-logs"
