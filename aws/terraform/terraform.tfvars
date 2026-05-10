@@ -1,7 +1,7 @@
 aws_region           = "ap-southeast-1"
 environment          = "dev"
 project_name         = "promptledger"
-instance_type        = "t3.micro"
+instance_type        = "t3.small"
 ssh_cidr_blocks      = ["0.0.0.0/0"]
 github_client_id     = "Ov23li42mm0keFORWMr7"
 github_client_secret = "97d16bd67f0da9483015b6feb616de2ad3e4bcd4"
