@@ -16,6 +16,7 @@ boto3
 reportlab
 click
 rich
+numpy
 pytest
 pytest-asyncio
 python-dotenv
