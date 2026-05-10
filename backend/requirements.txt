@@ -16,10 +16,6 @@ boto3
 reportlab
 click
 rich
-sentence-transformers
-numpy
-scipy
-deepeval
 pytest
 pytest-asyncio
 python-dotenv
