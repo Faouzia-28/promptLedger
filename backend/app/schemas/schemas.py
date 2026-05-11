@@ -54,7 +54,7 @@ class GitHubSyncRequest(BaseModel):
 	github_ref: Optional[str] = Field(default=None, max_length=128)
 	commit_sha: Optional[str] = Field(default=None, max_length=128)
 	branch: Optional[str] = Field(default=None, max_length=128)
-	model_config: Optional[dict] = None
+	config: Optional[dict] = None
 	eval_set_id: Optional[str] = Field(default=None, max_length=64)
 	trigger_eval: bool = True
 

@@ -285,7 +285,7 @@ async def sync_prompt_from_github(
             detail="Provide prompt content or a GitHub token for remote file fetch",
         )
 
-    model_config = request.model_config or content.get("model_config") or {}
+    model_config = request.config or content.get("model_config") or {}
 
     version = BehaviorVersion(
         id=uuid.uuid4(),
