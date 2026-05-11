@@ -42,7 +42,8 @@ cd /opt/promptledger/frontend
 npm ci --prefer-offline --no-audit
 
 # Build Next.js app
-NEXT_PUBLIC_API_URL="http://${backend_url}/api/v1" npm run build
+# backend_url already includes the scheme and port, so avoid prefixing http:// twice.
+NEXT_PUBLIC_API_URL="${backend_url}/api/v1" npm run build
 
 # Create a systemd service so the frontend stays up after cloud-init exits
 cat > /etc/systemd/system/promptledger-frontend.service << EOF

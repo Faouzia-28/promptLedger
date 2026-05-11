@@ -1,6 +1,22 @@
-version: '3.9'
-
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: promptledger-postgres
+    environment:
+      POSTGRES_DB: promptledger_db
+      POSTGRES_USER: promptledger
+      POSTGRES_PASSWORD: promptledger
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U promptledger -d promptledger_db']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   redis:
     image: redis:7-alpine
     container_name: promptledger-redis
@@ -21,10 +37,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: promptledger-api
+    env_file:
+      - ./backend/.env
     ports:
       - '8000:8000'
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      DATABASE_URL: postgresql+asyncpg://promptledger:promptledger@postgres:5432/promptledger_db
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -42,6 +60,8 @@ services:
       PROMETHEUS_ENABLED: 'true'
       ENABLE_REDIS_RATE_LIMITING: 'true'
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     restart: always
@@ -56,9 +76,11 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: promptledger-celery-worker
+    env_file:
+      - ./backend/.env
     command: celery -A app.workers.celery_app worker --loglevel=info
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      DATABASE_URL: postgresql+asyncpg://promptledger:promptledger@postgres:5432/promptledger_db
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -72,6 +94,7 @@ services:
       LOGSTASH_HOST: ${LOGSTASH_HOST:-logs}
       LOGSTASH_PORT: 5000
     depends_on:
+      - postgres
       - redis
       - api
     restart: always
@@ -81,9 +104,11 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: promptledger-celery-beat
+    env_file:
+      - ./backend/.env
     command: celery -A app.workers.celery_app beat --loglevel=info
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://promptledger:password@postgres:5432/promptledger_db}
+      DATABASE_URL: postgresql+asyncpg://promptledger:promptledger@postgres:5432/promptledger_db
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -97,9 +122,11 @@ services:
       LOGSTASH_HOST: ${LOGSTASH_HOST:-logs}
       LOGSTASH_PORT: 5000
     depends_on:
+      - postgres
       - redis
       - api
     restart: always
 
 volumes:
+  postgres_data:
   redis_data:

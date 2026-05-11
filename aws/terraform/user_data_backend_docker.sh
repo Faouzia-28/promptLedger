@@ -47,7 +47,7 @@ cd /opt/promptledger
 
 # Create .env file for backend services
 cat > .env << EOF
-DATABASE_URL=postgresql+asyncpg://promptledger:password@localhost:5432/promptledger_db
+DATABASE_URL=postgresql+asyncpg://promptledger:promptledger@postgres:5432/promptledger_db
 SECRET_KEY=$(openssl rand -hex 32)
 JWT_EXPIRATION_HOURS=24
 REDIS_URL=redis://redis:6379/0

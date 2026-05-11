@@ -19,6 +19,10 @@ export function useBehaviorUnits() {
   return useSWR('/units', fetcher, swrConfig);
 }
 
+export function useGitHubIntegrations() {
+  return useSWR('/github/integrations', fetcher, swrConfig);
+}
+
 export function useBehaviorUnit(unitId: string) {
   return useSWR(unitId ? `/units/${unitId}` : null, fetcher, swrConfig);
 }

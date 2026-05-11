@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     GROQ_MODEL: str = "llama-3.1-8b-instant"
     OLLAMA_MODEL: str = "llama3.1:8b"
     OLLAMA_FAST_MODEL: str = "phi3:mini"
+    EVAL_LLM_TIMEOUT_SECONDS: int = 45
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"

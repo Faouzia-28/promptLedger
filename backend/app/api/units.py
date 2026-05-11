@@ -24,6 +24,11 @@ class BehaviorVersionBase(BaseModel):
     config: Optional[dict] = None  # Renamed from model_config to avoid Pydantic conflict
     git_commit: Optional[str] = None
     git_branch: Optional[str] = None
+    source_provider: str = "manual"
+    source_repo: Optional[str] = None
+    source_path: Optional[str] = None
+    source_ref: Optional[str] = None
+    source_sha: Optional[str] = None
 
 
 class BehaviorVersionResponse(BehaviorVersionBase):
@@ -65,6 +70,11 @@ def serialize_behavior_version(version: BehaviorVersion) -> dict:
         "config": version.model_config,
         "git_commit": version.git_commit,
         "git_branch": version.git_branch,
+        "source_provider": getattr(version, "source_provider", "manual"),
+        "source_repo": getattr(version, "source_repo", None),
+        "source_path": getattr(version, "source_path", None),
+        "source_ref": getattr(version, "source_ref", None),
+        "source_sha": getattr(version, "source_sha", None),
         "status": version.status,
         "behavioral_fingerprint": version.behavioral_fingerprint,
         "created_by": str(version.created_by) if version.created_by else None,
@@ -193,9 +203,14 @@ async def create_version(
         unit_id=unit_uuid,
         version_number=next_version,
         content=request.content,
-        model_config=request.config,  # Map schema field 'config' to model field 'model_config'
+        model_config=request.config or {},  # Map schema field 'config' to model field 'model_config'
         git_commit=request.git_commit,
         git_branch=request.git_branch,
+        source_provider=request.source_provider,
+        source_repo=request.source_repo,
+        source_path=request.source_path,
+        source_ref=request.source_ref,
+        source_sha=request.source_sha,
         created_by=user_id,
         status="draft",
     )

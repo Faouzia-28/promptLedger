@@ -7,6 +7,7 @@ Configurable via LLM_PROVIDER setting in .env.
 from app.core.config import settings
 import httpx
 import json
+import asyncio
 
 
 class LLMService:
@@ -62,22 +63,40 @@ class LLMService:
     ) -> str:
         """Groq API chat endpoint."""
         async with httpx.AsyncClient(timeout=30.0) as client:
-            try:
-                response = await client.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
-                    json={
-                        "model": settings.GROQ_MODEL,
-                        "messages": messages,
-                        "temperature": temperature,
-                        "max_tokens": max_tokens,
-                    },
-                )
-                response.raise_for_status()
-                data = response.json()
-                return data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            except Exception as e:
-                raise RuntimeError(f"Groq error: {str(e)}")
+            payload = {
+                "model": settings.GROQ_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            # Retry on 429 with simple exponential backoff
+            for attempt in range(1, 4):
+                try:
+                    print(f"[GROQ REQUEST] attempt={attempt} payload={payload}")
+                    response = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
+                        json=payload,
+                    )
+                    # Log raw response json for debugging
+                    try:
+                        data = response.json()
+                    except Exception:
+                        data = None
+                    print(f"[GROQ RESPONSE] status={response.status_code} json={data}")
+                    response.raise_for_status()
+                    data = response.json()
+                    return data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                except httpx.HTTPStatusError as e:
+                    status = e.response.status_code if e.response is not None else None
+                    if status == 429 and attempt < 3:
+                        backoff = 0.5 * (2 ** (attempt - 1))
+                        print(f"[GROQ] 429 received, backing off {backoff}s (attempt {attempt})")
+                        await asyncio.sleep(backoff)
+                        continue
+                    raise RuntimeError(f"Groq error: {str(e)}")
+                except Exception as e:
+                    raise RuntimeError(f"Groq error: {str(e)}")
 
     async def fast_chat(self, messages: list[dict]) -> str:
         """Use the smaller/faster model for quick classification tasks."""

@@ -10,7 +10,7 @@ from app.core.middleware import RateLimitMiddleware, RequestSizeLimiterMiddlewar
 from starlette.responses import Response
 import logging
 from app.core.config import settings
-from app.api import auth, units, evals, drift, compliance, alerts, webhooks
+from app.api import auth, units, evals, drift, compliance, alerts, webhooks, github
 from contextlib import asynccontextmanager
 
 
@@ -151,6 +151,7 @@ app.include_router(evals.router, prefix="/api/v1")
 app.include_router(drift.router, prefix="/api/v1")
 app.include_router(compliance.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")
+app.include_router(github.router, prefix="/api/v1")
 
 # Include webhooks (no /api/v1 prefix for webhooks)
 app.include_router(webhooks.router)

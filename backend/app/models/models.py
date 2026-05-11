@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text, text
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
@@ -20,6 +20,8 @@ class Organization(Base):
     eval_sets = relationship("EvalSet", back_populates="organization", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="organization", cascade="all, delete-orphan")
     alert_configs = relationship("AlertConfig", back_populates="organization", cascade="all, delete-orphan")
+    github_integrations = relationship("GitHubIntegration", back_populates="organization", cascade="all, delete-orphan")
+    github_sync_events = relationship("GitHubSyncEvent", back_populates="organization", cascade="all, delete-orphan")
 
 
 class User(Base):
@@ -52,6 +54,7 @@ class BehaviorUnit(Base):
     eval_sets = relationship("EvalSet", back_populates="unit", cascade="all, delete-orphan")
     drift_events = relationship("DriftEvent", back_populates="unit", cascade="all, delete-orphan")
     production_samples = relationship("ProductionSample", back_populates="unit", cascade="all, delete-orphan")
+    github_integrations = relationship("GitHubIntegration", back_populates="unit")
 
 
 class BehaviorVersion(Base):
@@ -65,6 +68,11 @@ class BehaviorVersion(Base):
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
     git_commit = Column(String, nullable=True)
     git_branch = Column(String, nullable=True)
+    source_provider = Column(String, nullable=False, default="manual")
+    source_repo = Column(String, nullable=True)
+    source_path = Column(String, nullable=True)
+    source_ref = Column(String, nullable=True)
+    source_sha = Column(String, nullable=True)
     status = Column(String, nullable=False, default="draft")
     behavioral_fingerprint = Column(JSON, nullable=True)
     fingerprint_meta = Column(JSON, nullable=True)
@@ -74,6 +82,7 @@ class BehaviorVersion(Base):
     creator = relationship("User", back_populates="created_versions")
     eval_runs = relationship("EvalRun", back_populates="version", cascade="all, delete-orphan")
     drift_events = relationship("DriftEvent", back_populates="version")
+    github_sync_events = relationship("GitHubSyncEvent", back_populates="version")
 
 
 class EvalSet(Base):
@@ -168,3 +177,45 @@ class ProductionSample(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     unit = relationship("BehaviorUnit", back_populates="production_samples")
+
+
+class GitHubIntegration(Base):
+    __tablename__ = "github_integrations"
+    __table_args__ = (
+        UniqueConstraint("org_id", "repo_full_name", name="uq_github_integrations_org_repo"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
+    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    unit_id = Column(UUID(as_uuid=True), ForeignKey("behavior_units.id", ondelete="SET NULL"), nullable=True, index=True)
+    repo_full_name = Column(String, nullable=False, index=True)
+    default_branch = Column(String, nullable=False, default="main")
+    tracked_paths = Column(JSON, nullable=False, default=list)
+    enabled = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    organization = relationship("Organization", back_populates="github_integrations")
+    unit = relationship("BehaviorUnit", back_populates="github_integrations")
+    sync_events = relationship("GitHubSyncEvent", back_populates="integration", cascade="all, delete-orphan")
+
+
+class GitHubSyncEvent(Base):
+    __tablename__ = "github_sync_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
+    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    integration_id = Column(UUID(as_uuid=True), ForeignKey("github_integrations.id", ondelete="CASCADE"), nullable=False, index=True)
+    unit_id = Column(UUID(as_uuid=True), ForeignKey("behavior_units.id", ondelete="SET NULL"), nullable=True, index=True)
+    version_id = Column(UUID(as_uuid=True), ForeignKey("behavior_versions.id", ondelete="SET NULL"), nullable=True, index=True)
+    event_type = Column(String, nullable=False)
+    branch = Column(String, nullable=True)
+    commit_sha = Column(String, nullable=True)
+    file_path = Column(String, nullable=True)
+    status = Column(String, nullable=False, default="received")
+    details = Column(JSON, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    organization = relationship("Organization", back_populates="github_sync_events")
+    integration = relationship("GitHubIntegration", back_populates="sync_events")
+    unit = relationship("BehaviorUnit")
+    version = relationship("BehaviorVersion", back_populates="github_sync_events")

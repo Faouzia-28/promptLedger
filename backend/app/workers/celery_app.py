@@ -1,14 +1,25 @@
 """Celery application configuration for PromptLedger."""
 
 from celery import Celery
+import logging
 
 from app.core.config import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 celery = Celery(
 	"promptledger",
 	broker=settings.REDIS_URL,
 	backend=settings.REDIS_URL,
+)
+
+logger.info(
+	"Celery starting with LLM provider=%s groq_model=%s timeout=%s",
+	settings.LLM_PROVIDER,
+	settings.GROQ_MODEL,
+	settings.EVAL_LLM_TIMEOUT_SECONDS,
 )
 
 celery.conf.update(

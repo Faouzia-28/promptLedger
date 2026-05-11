@@ -1,5 +1,6 @@
 """Shared Pydantic request schemas for ingress hardening."""
 
+from datetime import datetime
 from typing import Optional
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
@@ -17,6 +18,56 @@ class GitHubWebhookPayload(BaseModel):
 	repository: Optional[dict] = None
 	organization: Optional[dict] = None
 	head_commit: Optional[dict] = None
+
+
+class GitHubIntegrationCreateRequest(BaseModel):
+	"""Create a GitHub repository integration."""
+
+	repo_full_name: str = Field(min_length=1, max_length=255)
+	default_branch: str = Field(default="main", max_length=128)
+	unit_id: Optional[str] = Field(default=None, max_length=64)
+	tracked_paths: list[str] = Field(default_factory=list)
+	enabled: bool = True
+
+
+class GitHubIntegrationResponse(BaseModel):
+	"""GitHub integration response."""
+
+	id: str
+	org_id: str
+	unit_id: Optional[str] = None
+	repo_full_name: str
+	default_branch: str
+	tracked_paths: list[str]
+	enabled: bool
+	created_at: datetime
+
+
+class GitHubSyncRequest(BaseModel):
+	"""Sync a prompt version from GitHub-sourced content."""
+
+	unit_name: str = Field(min_length=1, max_length=200)
+	repo_full_name: Optional[str] = Field(default=None, max_length=255)
+	file_path: str = Field(min_length=1, max_length=512)
+	content: dict
+	github_token: Optional[str] = Field(default=None, max_length=8_192)
+	github_ref: Optional[str] = Field(default=None, max_length=128)
+	commit_sha: Optional[str] = Field(default=None, max_length=128)
+	branch: Optional[str] = Field(default=None, max_length=128)
+	model_config: Optional[dict] = None
+	eval_set_id: Optional[str] = Field(default=None, max_length=64)
+	trigger_eval: bool = True
+
+
+class GitHubSyncResponse(BaseModel):
+	"""Response for GitHub prompt sync requests."""
+
+	integration_id: str
+	unit_id: str
+	version_id: str
+	eval_run_id: Optional[str] = None
+	status: str
+	message: str
 
 
 class SDKWebhookPayload(BaseModel):
