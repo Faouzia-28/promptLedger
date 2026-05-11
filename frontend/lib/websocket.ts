@@ -23,8 +23,21 @@ export class WebSocketClient {
 
   constructor(orgId: string) {
     this.orgId = orgId;
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+    const wsUrl = this.resolveWebSocketUrl();
     this.url = `${wsUrl}/ws/drift/${orgId}`;
+  }
+
+  private resolveWebSocketUrl() {
+    if (process.env.NEXT_PUBLIC_WS_URL) {
+      return process.env.NEXT_PUBLIC_WS_URL;
+    }
+
+    if (typeof window !== 'undefined') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${protocol}//${window.location.hostname}:8000`;
+    }
+
+    return 'ws://localhost:8000';
   }
 
   connect(): Promise<void> {
