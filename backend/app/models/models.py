@@ -191,6 +191,7 @@ class GitHubIntegration(Base):
     repo_full_name = Column(String, nullable=False, index=True)
     default_branch = Column(String, nullable=False, default="main")
     tracked_paths = Column(JSON, nullable=False, default=list)
+    github_access_token = Column(String, nullable=True)
     enabled = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 

@@ -5,7 +5,8 @@ from fastapi import APIRouter, Request, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.agents.drift_agent import drift_agent
-from app.workers.tasks import process_github_webhook, investigate_drift
+from app.api.github import _process_github_webhook_payload
+from app.workers.tasks import investigate_drift
 from app.core.database import get_db
 from app.core.idempotency import build_idempotency_key, claim_idempotency_key
 from app.schemas.schemas import GitHubWebhookPayload, SDKWebhookPayload, ProductionSampleRequest
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 
 @router.post("/github")
-async def github_webhook(request: Request):
+async def github_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     """
     Process GitHub push webhook.
     Verifies HMAC signature and queues processing.
@@ -37,7 +38,6 @@ async def github_webhook(request: Request):
     if not hmac.compare_digest(signature, expected_sig):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
     
-    # Queue processing via Celery
     delivery_id = request.headers.get("X-GitHub-Delivery", "")
     idempotency_key = build_idempotency_key(
         "github.webhook",
@@ -48,9 +48,9 @@ async def github_webhook(request: Request):
     if claimed.is_duplicate:
         return {"status": "duplicate", "event": payload.action or "push"}
 
-    process_github_webhook.delay(payload.model_dump(mode="json"))
-    
-    return {'status': 'queued', 'event': payload.action or 'push'}
+    result = await _process_github_webhook_payload(db, payload.model_dump(mode="json"))
+
+    return {"status": result.get("status", "processed"), "event": payload.action or "push", "result": result}
 
 
 @router.post("/sdk/{webhook_token}")

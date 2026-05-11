@@ -27,6 +27,7 @@ class GitHubIntegrationCreateRequest(BaseModel):
 	default_branch: str = Field(default="main", max_length=128)
 	unit_id: Optional[str] = Field(default=None, max_length=64)
 	tracked_paths: list[str] = Field(default_factory=list)
+	github_access_token: Optional[str] = Field(default=None, max_length=8_192)
 	enabled: bool = True
 
 
@@ -39,6 +40,7 @@ class GitHubIntegrationResponse(BaseModel):
 	repo_full_name: str
 	default_branch: str
 	tracked_paths: list[str]
+	has_github_token: bool
 	enabled: bool
 	created_at: datetime
 

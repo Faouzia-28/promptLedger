@@ -43,6 +43,7 @@ export default function GitHubSyncPage() {
   const [defaultBranch, setDefaultBranch] = useState('main');
   const [trackedPaths, setTrackedPaths] = useState('prompts/, system_prompts/');
   const [integrationUnitId, setIntegrationUnitId] = useState('');
+  const [integrationGithubToken, setIntegrationGithubToken] = useState('');
 
   const [selectedIntegrationId, setSelectedIntegrationId] = useState('');
   const [syncUnitId, setSyncUnitId] = useState('');
@@ -50,7 +51,7 @@ export default function GitHubSyncPage() {
   const [syncRepoFullName, setSyncRepoFullName] = useState('');
   const [filePath, setFilePath] = useState('');
   const [githubRef, setGitHubRef] = useState('main');
-  const [githubToken, setGitHubToken] = useState('');
+  const [githubToken, setGithubToken] = useState('');
   const [triggerEval, setTriggerEval] = useState(true);
   const [manualContent, setManualContent] = useState('');
 
@@ -69,6 +70,7 @@ export default function GitHubSyncPage() {
     setDefaultBranch('main');
     setTrackedPaths('prompts/, system_prompts/');
     setIntegrationUnitId('');
+    setIntegrationGithubToken('');
   };
 
   const resetSyncForm = () => {
@@ -95,6 +97,7 @@ export default function GitHubSyncPage() {
         default_branch: defaultBranch || 'main',
         unit_id: integrationUnitId || null,
         tracked_paths: trackedPathList,
+        github_access_token: integrationGithubToken || null,
         enabled: true,
       });
 
@@ -212,6 +215,19 @@ export default function GitHubSyncPage() {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="integration-github-token">GitHub access token</Label>
+                  <Input
+                    id="integration-github-token"
+                    type="password"
+                    value={integrationGithubToken}
+                    onChange={(e) => setIntegrationGithubToken(e.target.value)}
+                    placeholder="ghp_... or GitHub App token"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Stored for webhook file fetches and commit status updates.
+                  </p>
                 </div>
               </div>
 
@@ -430,4 +446,3 @@ export default function GitHubSyncPage() {
     </div>
   );
 }
-*** End Patch
