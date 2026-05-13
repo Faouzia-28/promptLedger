@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
     GITHUB_WEBHOOK_SECRET: str = "webhook_secret"
+    GITHUB_WEBHOOK_ALLOW_UNSIGNED: bool = False
 
 
 settings = Settings()

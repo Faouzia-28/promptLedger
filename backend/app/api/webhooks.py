@@ -26,17 +26,18 @@ async def github_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     
     # Verify HMAC signature
     signature = request.headers.get('X-Hub-Signature-256', '')
-    if not signature:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing signature")
-    
-    expected_sig = 'sha256=' + hmac.new(
-        settings.GITHUB_WEBHOOK_SECRET.encode(),
-        body,
-        'sha256'
-    ).hexdigest()
-    
-    if not hmac.compare_digest(signature, expected_sig):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
+    if not settings.GITHUB_WEBHOOK_ALLOW_UNSIGNED:
+        if not signature:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing signature")
+
+        expected_sig = 'sha256=' + hmac.new(
+            settings.GITHUB_WEBHOOK_SECRET.encode(),
+            body,
+            'sha256'
+        ).hexdigest()
+
+        if not hmac.compare_digest(signature, expected_sig):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
     
     delivery_id = request.headers.get("X-GitHub-Delivery", "")
     idempotency_key = build_idempotency_key(

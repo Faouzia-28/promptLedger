@@ -38,12 +38,16 @@ function toSyncContent(rawContent: string) {
 export default function GitHubSyncPage() {
   const { data: units } = useBehaviorUnits();
   const { data: integrations } = useGitHubIntegrations();
+  const webhookUrl = typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8000/api/v1/webhooks/github`
+    : 'http://localhost:8000/api/v1/webhooks/github';
 
   const [repoFullName, setRepoFullName] = useState('');
   const [defaultBranch, setDefaultBranch] = useState('main');
   const [trackedPaths, setTrackedPaths] = useState('prompts/, system_prompts/');
   const [integrationUnitId, setIntegrationUnitId] = useState('');
   const [integrationGithubToken, setIntegrationGithubToken] = useState('');
+  const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);
 
   const [selectedIntegrationId, setSelectedIntegrationId] = useState('');
   const [syncUnitId, setSyncUnitId] = useState('');
@@ -82,6 +86,12 @@ export default function GitHubSyncPage() {
     setGithubToken('');
     setTriggerEval(true);
     setManualContent('');
+  };
+
+  const copyWebhookUrl = async () => {
+    await navigator.clipboard.writeText(webhookUrl);
+    setCopiedWebhookUrl(true);
+    window.setTimeout(() => setCopiedWebhookUrl(false), 1800);
   };
 
   const handleCreateIntegration = async (e: React.FormEvent) => {
@@ -161,6 +171,39 @@ export default function GitHubSyncPage() {
           <Badge variant="outline" className="gap-1"><ShieldCheck className="h-3 w-3" /> eval trigger gate</Badge>
         </div>
       </div>
+
+        <Card className="border-primary/20 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-900 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100">
+          <CardContent className="grid gap-4 p-5 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="space-y-2">
+              <p className="text-sm font-semibold uppercase tracking-wide text-primary dark:text-sky-300">Fast setup</p>
+              <h2 className="text-xl font-semibold">Copy one webhook URL, then push your prompt change</h2>
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                This test deployment accepts unsigned webhooks, so the GitHub secret step can be skipped.
+                Connect the repo once, then every push to the tracked prompt paths will create a version and trigger evals.
+              </p>
+              <ol className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                <li>1. Save the integration below.</li>
+                <li>2. Paste the webhook URL into GitHub.</li>
+                <li>3. Leave the secret empty in GitHub for this test deployment.</li>
+                <li>4. Push a change inside a tracked path like <span className="font-medium text-slate-900 dark:text-slate-100">prompts/</span>.</li>
+              </ol>
+            </div>
+            <div className="space-y-3 rounded-2xl border border-slate-300 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="space-y-2">
+                <Label htmlFor="webhook-url">Webhook URL</Label>
+                <div className="flex gap-2">
+                  <Input id="webhook-url" value={webhookUrl} readOnly className="font-mono text-xs" />
+                  <Button type="button" variant="outline" onClick={copyWebhookUrl} className="shrink-0">
+                    {copiedWebhookUrl ? 'Copied' : 'Copy'}
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-slate-700 dark:text-slate-300">
+                In GitHub, add a webhook with Content type <span className="font-medium text-slate-900 dark:text-slate-100">application/json</span> and only the <span className="font-medium text-slate-900 dark:text-slate-100">push</span> event.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
       {(errorMessage || statusMessage) && (
         <Card className={errorMessage ? 'border-destructive/40 bg-destructive/5' : 'border-primary/40 bg-primary/5'}>
