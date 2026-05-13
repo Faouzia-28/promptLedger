@@ -14,8 +14,8 @@ import { Label } from '@/components/ui/label';
 export default function GitHubSyncPage() {
   const { data: integrations } = useGitHubIntegrations();
   const webhookUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/api/v1/webhooks/github`
-    : 'http://localhost:3000/api/v1/webhooks/github';
+    ? `${window.location.origin}/webhooks/github`
+    : 'http://localhost:3000/webhooks/github';
 
   const [repoFullName, setRepoFullName] = useState('');
   const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);

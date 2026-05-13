@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
 
     return [
       {
+        source: '/api/v1/webhooks/:path*',
+        destination: `${backendUrl}/webhooks/:path*`,
+      },
+      {
+        source: '/webhooks/:path*',
+        destination: `${backendUrl}/webhooks/:path*`,
+      },
+      {
         source: '/api/v1/:path*',
         destination: `${backendUrl}/api/v1/:path*`,
       },
