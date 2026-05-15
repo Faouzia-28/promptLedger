@@ -34,6 +34,15 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3000"
     GITHUB_WEBHOOK_SECRET: str = "webhook_secret"
     GITHUB_WEBHOOK_ALLOW_UNSIGNED: bool = False
+    # Scoring prompt templates (configurable)
+    EVAL_SCORE_SYSTEM_PROMPT: str = 'Respond ONLY with valid JSON containing an "overall" key with a numeric value between 0.0 and 1.0. Return no additional text.'
+    EVAL_SCORE_USER_TEMPLATE: str = (
+        'You are an objective evaluator. Score between 0.0 and 1.0 based ONLY on the criteria.\n'
+        'Input: {input}\n'
+        'Criteria: {criteria}\n'
+        'Response: {response}\n'
+        'Return ONLY valid JSON like: {"overall": 0.0}'
+    )
 
 
 settings = Settings()

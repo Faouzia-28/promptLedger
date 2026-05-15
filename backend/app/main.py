@@ -6,11 +6,12 @@ Main entry point for the backend API.
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.logging import configure_logging
-from app.core.middleware import RateLimitMiddleware, RequestSizeLimiterMiddleware
+from app.core.middleware import RateLimitMiddleware, RequestSizeLimiterMiddleware, InputNormalizationMiddleware
 from starlette.responses import Response
 import logging
 from app.core.config import settings
 from app.api import auth, units, evals, drift, compliance, alerts, webhooks, github
+from app.api import admin
 from contextlib import asynccontextmanager
 
 
@@ -48,6 +49,9 @@ app = FastAPI(
 
 # Attach middleware: request size limiter and simple in-memory rate limiter
 app.add_middleware(RequestSizeLimiterMiddleware, max_body_size=1024 * 1024)
+
+# Normalize incoming JSON bodies to make client inputs more tolerant
+app.add_middleware(InputNormalizationMiddleware, max_string_length=50000)
 
 # Prefer Redis-backed rate limiter when Redis is reachable, else fall back to in-memory
 from app.core.redis_limiter import create_redis_client
@@ -152,6 +156,7 @@ app.include_router(drift.router, prefix="/api/v1")
 app.include_router(compliance.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")
 app.include_router(github.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
 
 # Include webhooks (no /api/v1 prefix for webhooks)
 app.include_router(webhooks.router)

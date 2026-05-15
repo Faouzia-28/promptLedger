@@ -8,6 +8,8 @@ from app.core.config import settings
 import httpx
 import json
 import asyncio
+from app.core.observability import SCORE_LATENCY, SCORE_CALLS
+import time
 
 
 class LLMService:
@@ -72,12 +74,18 @@ class LLMService:
             # Retry on 429 with simple exponential backoff
             for attempt in range(1, 4):
                 try:
-                    print(f"[GROQ REQUEST] attempt={attempt} payload={payload}")
+                    start = time.time()
                     response = await client.post(
                         "https://api.groq.com/openai/v1/chat/completions",
                         headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
                         json=payload,
                     )
+                    elapsed = time.time() - start
+                    try:
+                        SCORE_CALLS.inc()
+                        SCORE_LATENCY.observe(elapsed)
+                    except Exception:
+                        pass
                     # Log raw response json for debugging
                     try:
                         data = response.json()

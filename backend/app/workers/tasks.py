@@ -10,6 +10,9 @@ from app.core.config import settings
 from app.models.models import BehaviorUnit, EvalRun, EvalSet, BehaviorVersion
 from app.workers.celery_app import celery
 from app.services.llm_service import llm
+from app.core.observability import observe_scorer
+from app.utils.score_parser import parse_score_text, fallback_heuristic
+from app.core.template_store import get_templates
 import asyncio
 from datetime import datetime, timezone
 
@@ -111,55 +114,128 @@ def run_regression_eval(eval_run_id: str):
 # Score output using LLM (works for any prompt type)
 				criteria = case.get('criteria', 'Is this response accurate and helpful?')
 				
-				# Clear, objective scoring prompt
-				score_prompt = f"""You are an objective evaluator. Score 0.0-1.0 based ONLY on criteria.
-Input: {case.get('input', '')[:250]}
-Criteria: {criteria}
-Response: {output[:400]}
-Return ONLY: {{"overall": 0.X}}"""
-				
+				# Build scoring messages using configurable templates
+				templates = get_templates()
+				user_template = templates.get('user_template') or settings.EVAL_SCORE_USER_TEMPLATE
+				system_prompt = templates.get('system_prompt') or settings.EVAL_SCORE_SYSTEM_PROMPT
+				user_content = user_template.format(
+					input=(case.get('input', '') or '')[:1000],
+					criteria=(criteria or '')[:500],
+					response=(output or '')[:2000],
+				)
 				score_messages = [
-					{'role': 'system', 'content': 'Respond ONLY with valid JSON: {"overall": value}. No other text.'},
-					{'role': 'user', 'content': score_prompt}
+					{'role': 'system', 'content': system_prompt},
+					{'role': 'user', 'content': user_content}
 				]
 				
 				print(f"[EVAL] Case {i} LLM scoring...")
+				import time
+				start_score = time.time()
 				score_result = _run_sync_llm(
 					score_messages,
 					temperature=0.0,
 					max_tokens=50,
 					timeout_seconds=llm_timeout,
 				)
+				elapsed_score = time.time() - start_score
 				print(f"[EVAL] Case {i} score response: {score_result}")
-				
+
+				# Robust score parsing: try JSON, extract JSON substring, tolerate single quotes, then regex number
 				score = 0.5  # Default fallback
-				try:
-					score_data = json.loads(score_result)
-					score = float(score_data.get('overall', 0.5))
-					print(f"[EVAL] Case {i} parsed score: {score}")
-				except (json.JSONDecodeError, ValueError) as e:
-					import re
-					match = re.search(r'[0-9]+\.?[0-9]*', score_result)
-					if match:
-						raw_score = float(match.group())
-						score = raw_score / 10 if raw_score > 1 else raw_score
-						print(f"[EVAL] Case {i} extracted score: {score}")
+				score_parse_error = None
+				def _parse_score(text: str):
+					import re, ast
+					if not text or not isinstance(text, str):
+						return None
+					# Try direct JSON
+					try:
+						obj = json.loads(text)
+						if isinstance(obj, dict) and 'overall' in obj:
+							return float(obj['overall'])
+						except Exception:
+						pass
+					# Try to find a JSON-like substring
+					m = re.search(r"\{[\s\S]*\}", text)
+					if m:
+						sub = m.group()
+						try:
+							obj = json.loads(sub)
+							if isinstance(obj, dict) and 'overall' in obj:
+								return float(obj['overall'])
+						except Exception:
+							# Try to tolerate single quotes via ast.literal_eval
+							try:
+								obj = ast.literal_eval(sub)
+								if isinstance(obj, dict) and 'overall' in obj:
+									return float(obj['overall'])
+							except Exception:
+								pass
+					# Last resort: number extraction
+					m2 = re.search(r"([0-9]+\.?[0-9]*)", text)
+					if m2:
+						val = float(m2.group(1))
+						# If likely 0-100 scale, normalize
+						if val > 1:
+							val = val / 100.0 if val > 1 and val <= 100 else (val / 10.0 if val > 1 and val <= 10 else val)
+						return float(max(0.0, min(1.0, val)))
+					return None
+
+				parsed_score = _parse_score(score_result)
+				if parsed_score is None:
+					# Record parse failure metric via observe_scorer later
+					parsed_ok = False
+					# Retry once with a slightly different system prompt (low-cost retry)
+					try:
+						retry_messages = [
+							{'role': 'system', 'content': 'Return only JSON with key "overall" between 0.0 and 1.0.'},
+							{'role': 'user', 'content': score_prompt},
+						]
+						retry_result = _run_sync_llm(retry_messages, temperature=0.0, max_tokens=60, timeout_seconds=llm_timeout)
+						parsed_score = _parse_score(retry_result)
+						if parsed_score is not None:
+							score_result = retry_result
+					except Exception:
+						parsed_score = None
+				if parsed_score is None:
+					# Fallback heuristic: overlap with expected output when available
+					expected = case.get('expected_output') or ''
+					if expected:
+						exp_words = set([w.lower() for w in expected.split() if len(w) > 2])
+						act_words = set([w.lower() for w in output.split() if len(w) > 2])
+						if exp_words:
+							overlap = len(exp_words & act_words) / len(exp_words)
+							score = float(max(0.0, min(1.0, overlap)))
+						else:
+							# length heuristic
+							ratio = min(1.0, len(output) / max(1, len(expected) or 1))
+							score = float(max(0.0, min(1.0, ratio)))
 					else:
 						score = 0.5
-						print(f"[EVAL] Case {i} parse failed, using default 0.5")
-				
+				else:
+					score = float(parsed_score)
+					parsed_ok = True
+				print(f"[EVAL] Case {i} parsed score: {score}")
+
 				# Ensure score is a valid number
 				if score is None:
 					score = 0.5
-				
+
+				# Observe scorer metrics (latency + parse success)
+				try:
+					observe_scorer(elapsed_score, parsed_ok=bool(parsed_ok))
+				except Exception:
+					pass
+
 				results.append({
 					'case_index': i,
 					'input': case.get('input', ''),
 					'expected': case.get('expected_output', ''),
 					'actual': output,
 					'score': float(score),
-					'passed': float(score) >= 0.7
+					'passed': float(score) >= 0.7,
+					'score_raw': score_result,
 				})
+
 			except Exception as e:
 				results.append({
 					'case_index': i,

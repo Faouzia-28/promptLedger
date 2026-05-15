@@ -101,3 +101,65 @@ class RequestSizeLimiterMiddleware(BaseHTTPMiddleware):
 
         # For unknown content-length, let the app read and rely on downstream validation.
         return await call_next(request)
+
+
+class InputNormalizationMiddleware(BaseHTTPMiddleware):
+    """Normalize incoming JSON request bodies.
+
+    - trims strings, collapses whitespace
+    - removes C0 control chars
+    - limits very large string fields
+    """
+
+    def __init__(self, app, max_string_length: int = 50_000):
+        super().__init__(app)
+        self.max_string_length = max_string_length
+
+    def _clean_string(self, s: str) -> str:
+        if not isinstance(s, str):
+            return s
+        # remove C0 control chars except newline/tab
+        import re
+
+        s = s.replace('\r\n', '\n')
+        s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", '', s)
+        s = s.strip()
+        s = re.sub(r"\s+", ' ', s)
+        if len(s) > self.max_string_length:
+            s = s[:self.max_string_length]
+        return s
+
+    def _normalize_obj(self, obj):
+        if isinstance(obj, dict):
+            return {k: self._normalize_obj(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [self._normalize_obj(v) for v in obj]
+        if isinstance(obj, str):
+            return self._clean_string(obj)
+        return obj
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        # Only attempt JSON body normalization for application/json
+        ct = request.headers.get('content-type', '')
+        if 'application/json' not in ct.lower():
+            return await call_next(request)
+
+        body = await request.body()
+        if not body:
+            return await call_next(request)
+
+        try:
+            import json
+
+            parsed = json.loads(body)
+            normalized = self._normalize_obj(parsed)
+            new_body = json.dumps(normalized).encode('utf-8')
+
+            async def receive():
+                return {"type": "http.request", "body": new_body, "more_body": False}
+
+            new_request = Request(request.scope, receive)
+            return await call_next(new_request)
+        except Exception:
+            # If parsing/normalization fails, pass original request through
+            return await call_next(request)

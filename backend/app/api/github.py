@@ -77,11 +77,38 @@ def _coerce_prompt_content(raw_text: str, file_path: str, metadata: dict | None 
                     parsed = candidate
             except Exception:
                 parsed = None
+    # If parsed is a dict, try to map common keys to canonical structure
+    def _sanitize_text(s: str) -> str:
+        import re
+        s = s or ''
+        s = s.replace('\r\n', '\n')
+        s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", '', s)
+        s = s.strip()
+        s = re.sub(r"\s+", ' ', s)
+        # Strip simple markdown/code fences
+        s = re.sub(r"^```[\s\S]*?```$", lambda m: m.group(0).strip('`'), s)
+        # Remove HTML tags conservatively
+        s = re.sub(r"<[^>]+>", '', s)
+        return s
 
     if parsed is None:
         parsed = {
             "prompt": raw_text,
         }
+    else:
+        # Map flexible placeholder keys to `prompt`
+        mapping_keys = [
+            'prompt', 'text', 'input', 'instruction', 'query', 'message', 'content', 'user_prompt', 'system_prompt'
+        ]
+        # If parsed contains a top-level key with content, map it
+        for key in mapping_keys:
+            if key in parsed and isinstance(parsed.get(key), str) and parsed.get(key).strip():
+                parsed = {'prompt': parsed.get(key), **{k: v for k, v in parsed.items() if k not in mapping_keys}}
+                break
+
+    # Sanitize prompt text fields
+    if isinstance(parsed.get('prompt'), str):
+        parsed['prompt'] = _sanitize_text(parsed['prompt'])
 
     parsed.setdefault("source", {})
     parsed["source"].update({
@@ -93,6 +120,16 @@ def _coerce_prompt_content(raw_text: str, file_path: str, metadata: dict | None 
     return parsed
 
 
+def _github_api_headers(token: Optional[str]) -> dict[str, str]:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 async def _fetch_github_file_content(
     repo_full_name: str,
     file_path: str,
@@ -101,11 +138,7 @@ async def _fetch_github_file_content(
 ) -> tuple[dict, str | None]:
     url = f"https://api.github.com/repos/{repo_full_name}/contents/{file_path.lstrip('/')}"
     params = {"ref": ref} if ref else None
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {token}",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _github_api_headers(token)
 
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.get(url, params=params, headers=headers)
@@ -183,11 +216,7 @@ async def _github_compare_files(
         return []
 
     url = f"https://api.github.com/repos/{repo_full_name}/compare/{base_sha}...{head_sha}"
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {token}",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _github_api_headers(token)
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(url, headers=headers)
 
@@ -247,7 +276,15 @@ async def _process_github_webhook_payload(db: AsyncSession, payload: dict) -> di
             head_sha = after
 
     for integration in integrations:
+        # Decrypt token if stored encrypted
         token = getattr(integration, "github_access_token", None)
+        if token:
+            try:
+                from app.core.security import decrypt_token
+                token = decrypt_token(token)
+            except Exception:
+                # leave token as-is if decryption fails
+                pass
         if base_sha and head_sha and token:
             changed_files = await _github_compare_files(repo_full_name, base_sha, head_sha, token)
         else:
@@ -344,11 +381,7 @@ async def _post_commit_status(
         "description": description[:140],
         "context": context,
     }
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {token}",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _github_api_headers(token)
 
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.post(url, json=payload, headers=headers)
@@ -534,7 +567,9 @@ async def create_integration(
         existing.unit_id = unit.id if unit else existing.unit_id
         existing.tracked_paths = request.tracked_paths
         if request.github_access_token:
-            existing.github_access_token = request.github_access_token
+            # Encrypt token before storing
+            from app.core.security import encrypt_token
+            existing.github_access_token = encrypt_token(request.github_access_token)
         existing.enabled = request.enabled
         await db.commit()
         await db.refresh(existing)
@@ -547,7 +582,7 @@ async def create_integration(
         repo_full_name=request.repo_full_name,
         default_branch=request.default_branch,
         tracked_paths=request.tracked_paths,
-        github_access_token=request.github_access_token,
+        github_access_token=(__import__('app.core.security', fromlist=['encrypt_token']).encrypt_token(request.github_access_token) if request.github_access_token else None),
         enabled=request.enabled,
     )
     db.add(integration)

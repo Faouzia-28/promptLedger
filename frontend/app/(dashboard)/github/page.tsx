@@ -20,6 +20,12 @@ export default function GitHubSyncPage() {
   const [repoFullName, setRepoFullName] = useState('');
   const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);
   const [integrationBusy, setIntegrationBusy] = useState(false);
+  const [editingIntegrationId, setEditingIntegrationId] = useState<string | null>(null);
+  const [editingRepoFullName, setEditingRepoFullName] = useState('');
+  const [editingDefaultBranch, setEditingDefaultBranch] = useState('main');
+  const [editingTrackedPaths, setEditingTrackedPaths] = useState('prompts/\nsystem_prompts/');
+  const [editingGithubToken, setEditingGithubToken] = useState('');
+  const [editingEnabled, setEditingEnabled] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -49,6 +55,61 @@ export default function GitHubSyncPage() {
       setRepoFullName('');
     } catch (err: any) {
       setErrorMessage(err.response?.data?.detail || 'Failed to create GitHub integration');
+    } finally {
+      setIntegrationBusy(false);
+    }
+  };
+
+  const startEditing = (integration: any) => {
+    setEditingIntegrationId(integration.id);
+    setEditingRepoFullName(integration.repo_full_name);
+    setEditingDefaultBranch(integration.default_branch || 'main');
+    setEditingTrackedPaths((integration.tracked_paths || []).join('\n') || 'prompts/\nsystem_prompts/');
+    setEditingGithubToken('');
+    setEditingEnabled(Boolean(integration.enabled));
+    setErrorMessage('');
+    setStatusMessage('');
+  };
+
+  const cancelEditing = () => {
+    setEditingIntegrationId(null);
+    setEditingRepoFullName('');
+    setEditingDefaultBranch('main');
+    setEditingTrackedPaths('prompts/\nsystem_prompts/');
+    setEditingGithubToken('');
+    setEditingEnabled(true);
+  };
+
+  const handleUpdateIntegration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRepoFullName) {
+      setErrorMessage('Repository name is missing for update');
+      return;
+    }
+
+    const trackedPaths = editingTrackedPaths
+      .split('\n')
+      .map((path) => path.trim())
+      .filter(Boolean);
+
+    setIntegrationBusy(true);
+    setErrorMessage('');
+    setStatusMessage('');
+
+    try {
+      const response = await api.post('/github/integrations', {
+        repo_full_name: editingRepoFullName,
+        default_branch: editingDefaultBranch || 'main',
+        tracked_paths: trackedPaths,
+        github_access_token: editingGithubToken.trim() || null,
+        enabled: editingEnabled,
+      });
+
+      await mutate('/github/integrations');
+      setStatusMessage(`Updated ${response.data.repo_full_name} successfully.`);
+      cancelEditing();
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.detail || 'Failed to update GitHub integration');
     } finally {
       setIntegrationBusy(false);
     }
@@ -128,16 +189,112 @@ export default function GitHubSyncPage() {
             {(integrations?.length || 0) > 0 ? (
               <div className="space-y-3">
                 {integrations.map((integration: any) => (
-                  <div key={integration.id} className="rounded-lg border border-border p-3">
+                  <div
+                    key={integration.id}
+                    className="rounded-lg border border-border p-3"
+                    onClick={() => startEditing(integration)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        startEditing(integration);
+                      }
+                    }}
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <div>
                         <p className="font-medium text-sm">{integration.repo_full_name}</p>
                         <p className="text-xs text-muted-foreground">Branch: {integration.default_branch}</p>
                       </div>
-                      <Badge variant={integration.enabled ? 'default' : 'secondary'}>
-                        {integration.enabled ? 'Active' : 'Disabled'}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={integration.has_github_token ? 'default' : 'outline'}>
+                          {integration.has_github_token ? 'Token set' : 'No token'}
+                        </Badge>
+                        <Badge variant={integration.enabled ? 'default' : 'secondary'}>
+                          {integration.enabled ? 'Active' : 'Disabled'}
+                        </Badge>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditing(integration);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </div>
                     </div>
+
+                    {editingIntegrationId === integration.id && (
+                      <form
+                        className="mt-4 space-y-3 border-t border-border pt-4"
+                        onSubmit={handleUpdateIntegration}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="space-y-2">
+                          <Label htmlFor={`branch-${integration.id}`}>Default branch</Label>
+                          <Input
+                            id={`branch-${integration.id}`}
+                            value={editingDefaultBranch}
+                            onChange={(e) => setEditingDefaultBranch(e.target.value)}
+                            placeholder="main"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`paths-${integration.id}`}>Tracked paths (one per line)</Label>
+                          <textarea
+                            id={`paths-${integration.id}`}
+                            value={editingTrackedPaths}
+                            onChange={(e) => setEditingTrackedPaths(e.target.value)}
+                            className="min-h-[88px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            placeholder={'prompts/\nsystem_prompts/'}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`token-${integration.id}`}>GitHub access token</Label>
+                          <Input
+                            id={`token-${integration.id}`}
+                            type="password"
+                            value={editingGithubToken}
+                            onChange={(e) => setEditingGithubToken(e.target.value)}
+                            placeholder="ghp_..."
+                            autoComplete="off"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Paste a PAT with repo read access, then save. Leave empty to keep existing token unchanged.
+                          </p>
+                        </div>
+
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={editingEnabled}
+                            onChange={(e) => setEditingEnabled(e.target.checked)}
+                          />
+                          Integration enabled
+                        </label>
+
+                        <div className="flex items-center gap-2">
+                          <Button type="submit" disabled={integrationBusy}>
+                            {integrationBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Save
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={cancelEditing}
+                            disabled={integrationBusy}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    )}
                   </div>
                 ))}
               </div>

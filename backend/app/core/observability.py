@@ -25,6 +25,31 @@ try:
             # Metrics should never raise
             pass
 
+    # Scorer-specific metrics
+    SCORE_CALLS = Counter(
+        "promptledger_scorer_calls_total",
+        "Total number of scorer invocations",
+    )
+
+    SCORE_PARSE_FAILURES = Counter(
+        "promptledger_scorer_parse_failures_total",
+        "Number of scorer responses that failed to parse",
+    )
+
+    SCORE_LATENCY = Histogram(
+        "promptledger_scorer_latency_seconds",
+        "Latency of scorer LLM calls in seconds",
+    )
+
+    def observe_scorer(latency_seconds: float, parsed_ok: bool = True) -> None:
+        try:
+            SCORE_CALLS.inc()
+            SCORE_LATENCY.observe(latency_seconds)
+            if not parsed_ok:
+                SCORE_PARSE_FAILURES.inc()
+        except Exception:
+            pass
+
 except Exception:
     # Fallback no-op metrics if prometheus_client is not installed.
     def observe_request(method: str, path: str, elapsed: float) -> None:

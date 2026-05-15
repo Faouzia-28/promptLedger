@@ -24,3 +24,4 @@ websockets
 email-validator
 prometheus_client
 nest_asyncio
+cryptography
