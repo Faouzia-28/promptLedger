@@ -1,176 +1,129 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import Link from 'next/link';
+import { ShieldCheck, KeyRound, Bell, ExternalLink, RefreshCw, LockKeyhole } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Key, Bell, Users } from 'lucide-react';
 
 export default function SettingsPage() {
-  const [githubToken, setGithubToken] = useState('');
-  const [slackUrl, setSlackUrl] = useState('');
-  const [alertThreshold, setAlertThreshold] = useState('medium');
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage integrations, alerts, and team preferences</p>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Security & Settings</h1>
+          <p className="text-muted-foreground">Token guidance, secret-handling notes, and quick links to the operational screens that matter.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary">Encrypted tokens</Badge>
+          <Badge variant="outline">Admin-only prompt store</Badge>
+        </div>
       </div>
 
-      <Tabs defaultValue="integrations" className="w-full">
-        <TabsList>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="border-border/70">
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">PAT handling</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">Server-side</p>
+            <p className="mt-2 text-sm text-muted-foreground">GitHub tokens are entered in the GitHub Sync page and stored encrypted on the backend.</p>
+          </CardContent>
+        </Card>
+        <Card className="border-border/70">
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Template storage</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">Runtime</p>
+            <p className="mt-2 text-sm text-muted-foreground">The scoring templates page writes into the runtime JSON store and keeps a browser-side rollback history.</p>
+          </CardContent>
+        </Card>
+        <Card className="border-border/70">
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Metrics</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">Prometheus</p>
+            <p className="mt-2 text-sm text-muted-foreground">Scorer calls, parse failures, and latency are exposed through the backend metrics endpoint.</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Integrations Tab */}
-        <TabsContent value="integrations" className="space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Key className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">GitHub Integration</h3>
+      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+        <Card className="border-border/70">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><KeyRound className="h-5 w-5 text-primary" />Token management</CardTitle>
+            <CardDescription>Use the GitHub Sync page for PAT rotation and connection setup. That keeps the secret flow in one place instead of scattering it across settings.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <p className="font-medium">What changed</p>
+              <p className="mt-1 text-muted-foreground">Repository cards now show whether a PAT is stored, whether the integration is enabled, and whether it is linked to a behavior unit.</p>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Connect your GitHub repository to track prompt changes
-            </p>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="github">GitHub Personal Access Token</Label>
-                <Input
-                  id="github"
-                  type="password"
-                  placeholder="ghp_..."
-                  value={githubToken}
-                  onChange={(e) => setGithubToken(e.target.value)}
-                />
-              </div>
-              <Button>Connect GitHub</Button>
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <p className="font-medium">Rotation pattern</p>
+              <p className="mt-1 text-muted-foreground">Open GitHub Sync, edit the integration, paste a new PAT, and save. The backend encrypts it before persistence.</p>
             </div>
-          </Card>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link href="/github"><ShieldCheck className="mr-2 h-4 w-4" />Open GitHub Sync</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/metrics"><RefreshCw className="mr-2 h-4 w-4" />Review metrics</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Bell className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Slack Integration</h3>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Receive drift alerts directly in your Slack workspace
-            </p>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="slack">Slack Webhook URL</Label>
-                <Input
-                  id="slack"
-                  type="password"
-                  placeholder="https://hooks.slack.com/..."
-                  value={slackUrl}
-                  onChange={(e) => setSlackUrl(e.target.value)}
-                />
-              </div>
-              <Button>Connect Slack</Button>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* Alerts Tab */}
-        <TabsContent value="alerts" className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Alert Preferences</h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="threshold">Minimum Alert Severity</Label>
-                <select 
-                  id="threshold"
-                  value={alertThreshold} 
-                  onChange={(e) => setAlertThreshold(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
-                >
-                  <option value="low">Low - All alerts</option>
-                  <option value="medium">Medium - Medium and above</option>
-                  <option value="high">High - High and critical only</option>
-                  <option value="critical">Critical - Critical only</option>
-                </select>
-              </div>
-
-              <div className="space-y-3 border-t border-border pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Email Alerts</p>
-                    <p className="text-sm text-muted-foreground">Receive alerts via email</p>
-                  </div>
-                  <input type="checkbox" defaultChecked className="w-4 h-4" />
+        <Card className="border-border/70">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><LockKeyhole className="h-5 w-5 text-primary" />Operational links</CardTitle>
+            <CardDescription>Keep the security story visible, but route users toward the pages where the actual work happens.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[
+              { href: '/github', title: 'GitHub Sync', detail: 'Manage integrations, PATs, and manual syncs.', icon: ExternalLink },
+              { href: '/templates', title: 'Scoring Templates', detail: 'Edit the runtime scorer prompt and rollback snapshots.', icon: ExternalLink },
+              { href: '/evals', title: 'Evals', detail: 'Filter runs, open details, and export results.', icon: ExternalLink },
+              { href: '/metrics', title: 'Metrics', detail: 'Inspect parse failures, calls, and latency.', icon: ExternalLink },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-muted/20 p-4 transition-colors hover:border-primary/40 hover:bg-muted/40">
+                <div>
+                  <p className="font-medium">{item.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Slack Notifications</p>
-                    <p className="text-sm text-muted-foreground">Post to Slack channel</p>
-                  </div>
-                  <input type="checkbox" defaultChecked className="w-4 h-4" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Daily Summary</p>
-                    <p className="text-sm text-muted-foreground">Email digest at 9 AM</p>
-                  </div>
-                  <input type="checkbox" className="w-4 h-4" />
-                </div>
-              </div>
+                <item.icon className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
 
-              <Button className="mt-4">Save Preferences</Button>
+      <Card className="border-border/70">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" />Preferences</CardTitle>
+          <CardDescription>The old placeholder preferences panel is no longer the primary path; these are just the defaults that still make sense in-app.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <p className="font-medium">Email alerts</p>
+              <p className="mt-1 text-muted-foreground">Configured outside this demo UI.</p>
             </div>
-          </Card>
-        </TabsContent>
-
-        {/* Team Tab */}
-        <TabsContent value="team" className="space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Users className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Team Members</h3>
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <p className="font-medium">Slack notifications</p>
+              <p className="mt-1 text-muted-foreground">Use the alert settings and webhook integrations in the backend.</p>
             </div>
-
-            <div className="space-y-4">
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">admin@example.com</p>
-                    <p className="text-sm text-muted-foreground">Administrator</p>
-                  </div>
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">Owner</span>
-                </div>
-              </div>
-
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">user@example.com</p>
-                    <p className="text-sm text-muted-foreground">Can view and manage units</p>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    Remove
-                  </Button>
-                </div>
-              </div>
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <p className="font-medium">Team access</p>
+              <p className="mt-1 text-muted-foreground">Role assignment is handled by the auth layer, not this page.</p>
             </div>
+          </div>
 
-            <Separator className="my-6" />
+          <Separator />
 
-            <div>
-              <h4 className="font-semibold mb-4">Invite Team Member</h4>
-              <div className="flex gap-2">
-                <Input placeholder="email@example.com" className="flex-1" />
-                <Button>Send Invite</Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <div className="rounded-2xl border border-dashed border-border bg-background/60 p-4 text-muted-foreground">
+            <p className="font-medium text-foreground">Why this page is intentionally thin</p>
+            <p className="mt-1">The important operational controls now live on the pages where the actions actually happen. That keeps token handling and prompt editing discoverable without duplicating forms that can drift out of sync.</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

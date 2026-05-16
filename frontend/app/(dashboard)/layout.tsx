@@ -6,14 +6,17 @@ import Link from 'next/link';
 import { useCurrentUser } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, LayoutDashboard, Target, TriangleAlert, ClipboardList, Settings, GitBranch } from 'lucide-react';
+import { Menu, LogOut, LayoutDashboard, Target, TriangleAlert, ClipboardList, Settings, GitBranch, BarChart3, FlaskConical, FileCog } from 'lucide-react';
 
 const navItems = [
   { href: '/overview', label: 'Overview', icon: LayoutDashboard },
   { href: '/units', label: 'Behavior Units', icon: Target },
+  { href: '/evals', label: 'Evals', icon: FileCog },
   { href: '/drift', label: 'Drift Events', icon: TriangleAlert },
   { href: '/audit', label: 'Audit Log', icon: ClipboardList },
   { href: '/github', label: 'GitHub Sync', icon: GitBranch },
+  { href: '/templates', label: 'Scoring Templates', icon: FlaskConical },
+  { href: '/metrics', label: 'Metrics', icon: BarChart3 },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

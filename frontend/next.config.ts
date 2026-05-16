@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
 
     return [
       {
+        source: '/metrics',
+        destination: `${backendUrl}/metrics`,
+      },
+      {
+        source: '/health',
+        destination: `${backendUrl}/health`,
+      },
+      {
         source: '/api/v1/webhooks/:path*',
         destination: `${backendUrl}/webhooks/:path*`,
       },

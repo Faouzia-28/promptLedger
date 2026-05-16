@@ -15,6 +15,8 @@ function resolveApiUrl() {
 
 const API_URL = resolveApiUrl();
 
+export { API_URL };
+
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
