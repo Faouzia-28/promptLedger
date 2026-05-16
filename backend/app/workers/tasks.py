@@ -152,8 +152,8 @@ def run_regression_eval(eval_run_id: str):
 						obj = json.loads(text)
 						if isinstance(obj, dict) and 'overall' in obj:
 							return float(obj['overall'])
-						except Exception:
-							pass
+					except Exception:
+						pass
 					# Try to find a JSON-like substring
 					m = re.search(r"\{[\s\S]*\}", text)
 					if m:
