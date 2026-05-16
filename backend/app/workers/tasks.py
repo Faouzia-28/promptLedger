@@ -153,7 +153,7 @@ def run_regression_eval(eval_run_id: str):
 						if isinstance(obj, dict) and 'overall' in obj:
 							return float(obj['overall'])
 						except Exception:
-						pass
+							pass
 					# Try to find a JSON-like substring
 					m = re.search(r"\{[\s\S]*\}", text)
 					if m:
@@ -188,7 +188,7 @@ def run_regression_eval(eval_run_id: str):
 					try:
 						retry_messages = [
 							{'role': 'system', 'content': 'Return only JSON with key "overall" between 0.0 and 1.0.'},
-							{'role': 'user', 'content': score_prompt},
+							{'role': 'user', 'content': user_content},
 						]
 						retry_result = _run_sync_llm(retry_messages, temperature=0.0, max_tokens=60, timeout_seconds=llm_timeout)
 						parsed_score = _parse_score(retry_result)
