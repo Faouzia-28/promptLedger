@@ -1,3 +1,9 @@
+# CANONICAL PRODUCTION DEPLOYMENT
+# This is the source of truth for all PromptLedger deployments.
+# Must be run from the root repository directory.
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
+# See DEPLOYMENT.md for full documentation.
+
 services:
   postgres:
     image: postgres:15-alpine
