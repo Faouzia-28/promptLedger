@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Line, LineChart, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useBehaviorUnits, useDriftEvents, useGitHubIntegrations, useCurrentUser } from '@/lib/hooks';
@@ -9,45 +10,67 @@ import { WebSocketClient } from '@/lib/websocket';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { formatDateTime, shortId, truncateText } from '@/lib/dashboard';
-import { Activity, BarChart3, CheckCircle2, GitBranch, PlayCircle, Plus, ShieldAlert, Sparkles, TerminalSquare, TriangleAlert, Workflow } from 'lucide-react';
+import { formatDateTime, shortId } from '@/lib/dashboard';
+import { Activity, BarChart3, GitBranch, PlayCircle, Plus, ShieldAlert, Sparkles, TerminalSquare } from 'lucide-react';
 
-function OverviewStat({ label, value, detail, icon: Icon, tone = 'default' }: {
-  label: string;
-  value: string | number;
-  detail?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  tone?: 'default' | 'success' | 'warning' | 'danger';
-}) {
-  const toneClass = {
-    default: 'text-primary',
-    success: 'text-emerald-500',
-    warning: 'text-amber-500',
-    danger: 'text-rose-500',
+function StatAccent({ tone }: { tone: 'neutral' | 'good' | 'warning' | 'error' }) {
+  const classes = {
+    neutral: 'border-sky-500/70',
+    good: 'border-emerald-500/70',
+    warning: 'border-amber-500/70',
+    error: 'border-rose-500/70',
   }[tone];
+  return <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${classes}`} />;
+}
 
+function StatCard({ label, value, detail, tone }: { label: string; value: string | number; detail?: string; tone: 'neutral' | 'good' | 'warning' | 'error' }) {
   return (
-    <Card className="border-border/70 bg-card/80 shadow-sm">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-foreground">{value}</p>
-            {detail ? <p className="mt-2 text-sm text-muted-foreground">{detail}</p> : null}
-          </div>
-          <div className={`rounded-2xl border border-border bg-muted/30 p-3 ${toneClass}`}>
-            <Icon className="h-5 w-5" />
-          </div>
-        </div>
+    <Card className="relative overflow-hidden border border-zinc-700 bg-[#1a1d27]">
+      <StatAccent tone={tone} />
+      <CardContent className="p-5 pl-7">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="mt-2 text-4xl font-bold tracking-tight text-zinc-50">{value}</p>
+        {detail ? <p className="mt-2 text-sm text-muted-foreground">{detail}</p> : null}
       </CardContent>
     </Card>
   );
 }
 
+function QuickActionPill({ href, icon: Icon, label }: { href: string; icon: React.ComponentType<{ className?: string }>; label: string }) {
+  return (
+    <Button asChild variant="outline" className="h-10 rounded-full border-zinc-700 bg-zinc-900/80 px-4 text-zinc-100 hover:bg-zinc-800/80 hover:text-white">
+      <Link href={href} className="inline-flex items-center gap-2">
+        <Icon className="h-4 w-4" />
+        {label}
+      </Link>
+    </Button>
+  );
+}
+
+function HealthSparkline({ points }: { points: number[] }) {
+  const trendUp = points.length > 1 ? points[points.length - 1] >= points[0] : true;
+  const data = points.map((value, index) => ({ index, value }));
+
+  return (
+    <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-3">
+      <div className="mb-2 flex items-center justify-between gap-3 text-xs text-zinc-400">
+        <span>Health trend</span>
+        <span className={trendUp ? 'text-emerald-400' : 'text-rose-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
+      </div>
+      <div className="h-[60px] w-[200px] max-w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <Line type="monotone" dataKey="value" stroke={trendUp ? '#22c55e' : '#f43f5e'} strokeWidth={2.5} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 export default function OverviewPage() {
   const { data: units } = useBehaviorUnits();
-  const { data: driftEvents, isLoading: driftLoading } = useDriftEvents();
+  const { data: driftEvents } = useDriftEvents();
   const { data: integrations } = useGitHubIntegrations();
   const { user } = useCurrentUser();
   const [recentRuns, setRecentRuns] = useState<any[]>([]);
@@ -66,10 +89,7 @@ export default function OverviewPage() {
     const unsubscribe = client.subscribe((notification) => {
       toast.error(`Drift detected: ${notification.severity.toUpperCase()}`, {
         description: `Unit ${notification.unit_id} crossed ${(notification.drift_score * 100).toFixed(1)}% drift`,
-        action: {
-          label: 'View',
-          onClick: () => window.location.href = `/drift/${notification.unit_id}`,
-        },
+        action: { label: 'View', onClick: () => window.location.href = `/drift/${notification.unit_id}` },
       });
     });
 
@@ -95,10 +115,7 @@ export default function OverviewPage() {
             try {
               const response = await api.get(`/evals/units/${unit.id}/runs`);
               const runs = Array.isArray(response.data) ? response.data : [];
-              return runs.slice(0, 3).map((run: any) => ({
-                ...run,
-                unit_name: unit.name,
-              }));
+              return runs.slice(0, 3).map((run: any) => ({ ...run, unit_name: unit.name }));
             } catch {
               return [];
             }
@@ -110,237 +127,133 @@ export default function OverviewPage() {
             results
               .flat()
               .sort((left, right) => String(right.created_at).localeCompare(String(left.created_at)))
-              .slice(0, 6)
+              .slice(0, 10)
           );
         }
       } finally {
-        if (!cancelled) {
-          setRecentLoading(false);
-        }
+        if (!cancelled) setRecentLoading(false);
       }
     };
 
     void loadRecentRuns();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [unitList]);
-
-  const healthScore = useMemo(() => {
-    const openAlerts = driftEventList.filter((event: any) => !event.resolved).length;
-    const total = driftEventList.length || 1;
-    return Math.max(0, Math.round(100 - (openAlerts / total) * 100));
-  }, [driftEventList]);
-
-  const activeRuns = recentRuns.filter((run) => run.status === 'pending' || run.status === 'running').length;
-  const averageScore = recentRuns.length
-    ? recentRuns.reduce((sum, run) => sum + (Number(run.score) || 0), 0) / recentRuns.length
-    : 0;
-
-  const activityFeed = [
-    ...recentRuns.slice(0, 3).map((run) => ({
-      type: 'eval',
-      title: `${run.unit_name || 'Unknown unit'} · ${run.status}`,
-      detail: `Run ${shortId(run.id)} scored ${Number(run.score || 0).toFixed(2)}`,
-      time: run.completed_at || run.created_at,
-      href: `/evals/${run.id}`,
-    })),
-    ...driftEventList.slice(0, 3).map((event: any) => ({
-      type: 'drift',
-      title: `${event.unit?.name || 'Unknown unit'} · ${event.severity}`,
-      detail: truncateText(event.details, 96),
-      time: event.created_at,
-      href: `/drift/${event.id}`,
-    })),
-    ...integrationList.slice(0, 2).map((integration: any) => ({
-      type: 'github',
-      title: integration.repo_full_name,
-      detail: `${integration.default_branch} · ${integration.enabled ? 'active' : 'disabled'}`,
-      time: integration.created_at,
-      href: '/github',
-    })),
-  ].sort((left, right) => String(right.time).localeCompare(String(left.time))).slice(0, 6);
 
   const openDrifts = driftEventList.filter((event: any) => !event.resolved).length;
   const tokenReadyCount = integrationList.filter((integration: any) => integration.has_github_token).length;
+  const activeRuns = recentRuns.filter((run) => run.status === 'pending' || run.status === 'running').length;
+  const averageScore = recentRuns.length ? recentRuns.reduce((sum, run) => sum + (Number(run.score) || 0), 0) / recentRuns.length : 0;
+  const healthScore = useMemo(() => {
+    const total = recentRuns.length || 1;
+    const recentFailures = recentRuns.filter((run) => run.status === 'failed' || Number(run.score) < 0.5).length;
+    return Math.max(0, Math.round(100 - (recentFailures / total) * 100));
+  }, [recentRuns]);
+
+  const trendPoints = useMemo(() => {
+    const scores = recentRuns
+      .slice()
+      .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
+      .slice(-10)
+      .map((run) => Number(run.score) || 0);
+    return scores.length > 1 ? scores : [0, 0, 0, 0, 0];
+  }, [recentRuns]);
+
+  const recentTimeline = recentRuns.slice(0, 4).map((run) => ({
+    id: run.id,
+    status: run.status || 'running',
+    score: Number(run.score) || 0,
+    time: run.completed_at || run.created_at,
+    unitName: run.unit_name || 'Unknown unit',
+  }));
 
   return (
-    <div className="space-y-8">
-      <div className="rounded-3xl border border-border/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-slate-50 shadow-xl sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-slate-200">
-              <Sparkles className="h-3.5 w-3.5" />
-              PromptLedger command center
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Your prompt operations dashboard now has a pulse.</h1>
-              <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
-                See units, runs, drift, GitHub syncs, and scorer health in one place. Quick actions below take you directly to the workflows people actually use.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild className="bg-white text-slate-950 hover:bg-slate-200">
-                <Link href="/units"><Plus className="mr-2 h-4 w-4" />Create unit</Link>
-              </Button>
-              <Button asChild variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white">
-                <Link href="/github"><GitBranch className="mr-2 h-4 w-4" />Sync repository</Link>
-              </Button>
-              <Button asChild variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white">
-                <Link href="/templates"><TerminalSquare className="mr-2 h-4 w-4" />Edit templates</Link>
-              </Button>
-              <Button asChild variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white">
-                <Link href="/metrics"><BarChart3 className="mr-2 h-4 w-4" />View metrics</Link>
-              </Button>
-            </div>
+    <div className="space-y-8 bg-[#0f1117] text-zinc-100">
+      <div className="flex flex-col gap-4 border-b border-zinc-700 pb-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-zinc-500">
+            <Sparkles className="h-3.5 w-3.5" />
+            PromptLedger dashboard
           </div>
-
-          <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200 sm:min-w-[260px]">
-            <div className="flex items-center justify-between gap-4">
-              <span>Organization</span>
-              <span className="font-medium">{user?.org_id ? shortId(user.org_id, 12) : 'unknown'}</span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span>Authenticated as</span>
-              <span className="font-medium truncate">{user?.email || 'unknown'}</span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span>Connected repos</span>
-              <span className="font-medium">{integrationList.length}</span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span>Open drift alerts</span>
-              <span className="font-medium">{openDrifts}</span>
-            </div>
-          </div>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">{user?.org_id ? shortId(user.org_id, 12) : 'Organization'}</h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Repos {integrationList.length}</Badge>
+          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Alerts {openDrifts}</Badge>
+          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Active evals {activeRuns}</Badge>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <OverviewStat label="Behavior units" value={unitList.length} detail="Registered prompt surfaces" icon={Workflow} />
-        <OverviewStat label="Eval runs" value={recentRuns.length} detail={recentLoading ? 'Loading live runs...' : `${activeRuns} still active`} icon={PlayCircle} tone="default" />
-        <OverviewStat label="Open drift" value={openDrifts} detail={`${healthScore}% health score`} icon={ShieldAlert} tone={openDrifts ? 'warning' : 'success'} />
-        <OverviewStat label="Connected repos" value={integrationList.length} detail={`${tokenReadyCount} PATs stored securely`} icon={GitBranch} tone={tokenReadyCount ? 'success' : 'warning'} />
-        <OverviewStat label="Avg eval score" value={recentRuns.length ? averageScore.toFixed(2) : '0.00'} detail="Across the latest runs" icon={CheckCircle2} tone="success" />
+      <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+        <StatCard label="Behavior units" value={unitList.length} detail="Registered prompt surfaces" tone="neutral" />
+        <StatCard label="Eval runs" value={recentRuns.length} detail={recentLoading ? 'Loading live runs...' : `${activeRuns} still active`} tone="neutral" />
+        <StatCard label="Open drift" value={openDrifts} detail={`${healthScore}% health score`} tone={openDrifts ? 'warning' : 'good'} />
+        <StatCard label="Connected repos" value={integrationList.length} detail={`${tokenReadyCount} PATs stored securely`} tone={tokenReadyCount ? 'good' : 'warning'} />
+        <StatCard label="Avg eval score" value={recentRuns.length ? averageScore.toFixed(2) : '0.00'} detail="Across the latest runs" tone="good" />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <Card className="border-border/70">
-          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
-            <div>
-              <CardTitle>Quick actions</CardTitle>
-              <CardDescription>Jump straight to the workflows that unblock debugging and review.</CardDescription>
-            </div>
-            <Badge variant="secondary">Live</Badge>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {[
-              { href: '/units', title: 'Create or edit a unit', detail: 'Push versions and compare behavior', icon: Plus },
-              { href: '/github', title: 'Manage GitHub sync', detail: 'Connect repos and run manual syncs', icon: GitBranch },
-              { href: '/evals', title: 'Inspect eval runs', detail: 'Filter, expand, and re-run evaluations', icon: PlayCircle },
-              { href: '/templates', title: 'Edit scoring templates', detail: 'Tune the prompt that scores outputs', icon: TerminalSquare },
-              { href: '/metrics', title: 'Review metrics', detail: 'Parse failure rate, latency, and throughput', icon: BarChart3 },
-              { href: '/audit', title: 'Export audit trail', detail: 'See compliance and change history', icon: Activity },
-            ].map((action) => (
-              <Link key={action.href} href={action.href} className="group rounded-2xl border border-border bg-muted/20 p-4 transition-colors hover:border-primary/40 hover:bg-muted/40">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <action.icon className="h-4 w-4 text-primary" />
-                      {action.title}
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">{action.detail}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/70">
-          <CardHeader>
-            <CardTitle>System health</CardTitle>
-            <CardDescription>Small but useful signals that tell you whether the pipeline is alive.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <div className="rounded-2xl border border-border bg-muted/20 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Health score</span>
-                <span className="font-semibold">{healthScore}%</span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-emerald-500" style={{ width: `${healthScore}%` }} />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">Open drift alerts</span>
-                <span className="font-medium">{openDrifts}</span>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">Active evals</span>
-                <span className="font-medium">{activeRuns}</span>
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">GitHub PATs</span>
-                <span className="font-medium">{tokenReadyCount}</span>
-              </div>
-            </div>
-            <Separator />
-            <div className="rounded-2xl border border-dashed border-border bg-background/60 p-4 text-xs text-muted-foreground">
-              The dashboard now reflects the live data path rather than a static welcome screen. If a section is still empty, the pipeline feeding it is usually the missing piece.
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col gap-3 border-y border-zinc-700 bg-[#1a1d27] px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Quick actions</p>
+          <p className="mt-1 text-sm text-zinc-300">Compact toolbar for the most common workflows.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <QuickActionPill href="/units" icon={Plus} label="Create unit" />
+          <QuickActionPill href="/github" icon={GitBranch} label="GitHub sync" />
+          <QuickActionPill href="/evals" icon={PlayCircle} label="Inspect evals" />
+          <QuickActionPill href="/templates" icon={TerminalSquare} label="Scoring templates" />
+          <QuickActionPill href="/metrics" icon={BarChart3} label="Metrics" />
+          <QuickActionPill href="/audit" icon={Activity} label="Audit trail" />
+        </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card className="border-border/70">
+      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+        <Card className="border-zinc-700 bg-[#1a1d27]">
           <CardHeader>
             <CardTitle>Recent activity</CardTitle>
-            <CardDescription>Latest evals, drift alerts, and repository syncs.</CardDescription>
+            <CardDescription>Latest eval runs with status, score, and timestamp.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {activityFeed.length > 0 ? (
-              activityFeed.map((item) => (
-                <Link key={`${item.type}-${item.title}-${item.time}`} href={item.href} className="block rounded-2xl border border-border bg-muted/20 p-4 transition-colors hover:border-primary/40 hover:bg-muted/40">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={item.type === 'drift' ? 'destructive' : item.type === 'github' ? 'secondary' : 'default'} className="capitalize">{item.type}</Badge>
-                        <p className="font-medium">{item.title}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{item.detail}</p>
-                    </div>
-                    <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(item.time)}</span>
+          <CardContent className="space-y-3">
+            {recentTimeline.length > 0 ? recentTimeline.map((item) => {
+              const isPassed = item.status === 'passed' || item.score >= 0.5;
+              const isFailed = item.status === 'failed' || item.score < 0.5;
+              const dot = isPassed ? 'bg-emerald-500' : isFailed ? 'bg-rose-500' : 'bg-zinc-500';
+              const badgeClass = isPassed
+                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
+                : isFailed
+                  ? 'border-rose-500/20 bg-rose-500/10 text-rose-300'
+                  : 'border-amber-500/20 bg-amber-500/10 text-amber-300';
+
+              return (
+                <Link key={item.id} href={`/evals/${item.id}`} className="grid grid-cols-[16px_1fr_auto] items-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-900/60 px-4 py-3 transition-colors hover:bg-zinc-800/70">
+                  <span className={`h-2.5 w-2.5 rounded-full ${dot}`} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-zinc-100">{item.unitName}</p>
+                    <p className="font-mono text-xs text-zinc-400">Run {shortId(item.id)}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 text-right">
+                    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}>Score {item.score.toFixed(2)}</span>
+                    <span className="text-xs text-zinc-500">{formatDateTime(item.time)}</span>
                   </div>
                 </Link>
-              ))
-            ) : (
-              <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-                Once you sync a repo or run an eval, the feed will populate here automatically.
-              </div>
+              );
+            }) : (
+              <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/60 p-6 text-sm text-zinc-400">Once you sync a repo or run an eval, the feed will populate here automatically.</div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-border/70">
+        <Card className="border-zinc-700 bg-[#1a1d27]">
           <CardHeader>
-            <CardTitle>What to check next</CardTitle>
-            <CardDescription>A short operational checklist that replaces guesswork.</CardDescription>
+            <CardTitle>Health trend</CardTitle>
+            <CardDescription>Last 10 runs at a glance.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            {[
-              'Open GitHub Sync and confirm each repository shows a real PAT state.',
-              'Enter the Evals page and expand one run to verify score_raw and case details.',
-              'Review scoring templates before comparing two versions.',
-              'Use Metrics to confirm scorer calls and parse failures are moving the right way.',
-            ].map((step, index) => (
-              <div key={step} className="flex gap-3 rounded-2xl border border-border bg-muted/20 p-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">{index + 1}</div>
-                <p className="text-muted-foreground">{step}</p>
-              </div>
-            ))}
+          <CardContent className="space-y-4">
+            <HealthSparkline points={trendPoints} />
+            <div className="grid gap-3 rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 text-xs text-zinc-300">
+              <div className="flex items-center justify-between gap-3"><span>Open drift</span><span className="font-medium text-zinc-100">{openDrifts}</span></div>
+              <div className="flex items-center justify-between gap-3"><span>Active evals</span><span className="font-medium text-zinc-100">{activeRuns}</span></div>
+              <div className="flex items-center justify-between gap-3"><span>PATs</span><span className="font-medium text-zinc-100">{tokenReadyCount}</span></div>
+            </div>
           </CardContent>
         </Card>
       </div>

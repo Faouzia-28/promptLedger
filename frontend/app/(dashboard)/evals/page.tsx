@@ -103,6 +103,29 @@ export default function EvalsPage() {
     setMessage(`Exported ${filteredRuns.length} runs to CSV.`);
   };
 
+  const scoreTone = (score: number | null | undefined) => {
+    const value = Number(score ?? 0);
+    if (value >= 0.8) return 'emerald';
+    if (value >= 0.5) return 'amber';
+    return 'rose';
+  };
+
+  const scoreBadgeClass = (score: number | null | undefined) => {
+    const tone = scoreTone(score);
+    return tone === 'emerald'
+      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
+      : tone === 'amber'
+        ? 'border-amber-500/20 bg-amber-500/10 text-amber-300'
+        : 'border-rose-500/20 bg-rose-500/10 text-rose-300';
+  };
+
+  const statusBadgeClass = (status: string) => {
+    if (status === 'failed') return 'border border-red-400/20 bg-red-400/10 text-red-400';
+    if (status === 'passed') return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+    if (status === 'degraded') return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
+    return 'border border-zinc-700 bg-zinc-900 text-zinc-200';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -126,17 +149,17 @@ export default function EvalsPage() {
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <MetricCard label="Visible runs" value={totals.total} detail="After filters" />
-        <MetricCard label="Pending" value={totals.pending} detail="Waiting or running" />
-        <MetricCard label="Passed" value={totals.passed} detail="Run status passed" tone="success" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Visible runs" value={totals.total} detail="After filters" tone="neutral" />
+        <MetricCard label="Pending" value={totals.pending} detail="Waiting or running" tone="neutral" />
+        <MetricCard label="Passed" value={totals.passed} detail="Run status passed" tone="good" />
         <MetricCard label="Degraded" value={totals.degraded} detail="Needs review" tone="warning" />
       </div>
 
       <Card className="border-border/70">
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><Filter className="h-5 w-5 text-primary" />Filters</CardTitle>
-          <CardDescription>The eval list is most useful when you can narrow it to a unit or status instead of scanning everything at once.</CardDescription>
+          <CardDescription>Use a couple of filters at a time so the run list stays readable.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2 md:col-span-1">
@@ -177,33 +200,45 @@ export default function EvalsPage() {
             <Skeleton className="h-72 w-full" />
           ) : filteredRuns.length > 0 ? (
             <div className="space-y-3">
-              {filteredRuns.map((run) => (
-                <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-2xl border border-border bg-muted/20 p-4 transition-colors hover:border-primary/40 hover:bg-muted/40">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium">{run.unit_name || 'Unknown unit'}</p>
-                        <Badge variant="secondary">{run.eval_set_name}</Badge>
-                        <Badge variant="outline">Version {shortId(run.version_id, 6)}</Badge>
+              {filteredRuns.map((run) => {
+                const score = Number(run.score ?? 0);
+                return (
+                  <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-3xl border border-zinc-700 bg-zinc-900/60 p-5 transition-colors hover:bg-zinc-800/50 hover:border-zinc-600">
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold text-zinc-100">{run.unit_name || 'Unknown unit'}</p>
+                          <Badge variant="secondary" className="border-zinc-700 bg-zinc-800 text-zinc-100">{run.eval_set_name}</Badge>
+                          <Badge variant="outline" className="border-zinc-700 bg-zinc-900 text-zinc-100">Version {shortId(run.version_id, 6)}</Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(run.status)}`}>
+                            {run.status === 'failed' ? 'Failed' : run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+                          </span>
+                          <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${scoreBadgeClass(score)}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${scoreTone(score) === 'emerald' ? 'bg-emerald-300' : scoreTone(score) === 'amber' ? 'bg-amber-300' : 'bg-rose-300'}`} />
+                            Score {score.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">Run {shortId(run.id)} · {run.case_count} cases · created {formatDateTime(run.created_at)}</p>
+
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                        <span className="font-mono text-zinc-300">Run {shortId(run.id)}</span>
+                        <span>· {run.case_count} cases</span>
+                        <span>· created {formatDateTime(run.created_at)}</span>
+                      </div>
+
+                      <div className="max-w-full overflow-hidden rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200">
+                        <div className="truncate">
+                          {Array.isArray(run.results) && run.results.length > 0
+                            ? truncateText(run.results[0]?.score_raw || run.results[0]?.actual || run.results[0]?.input || 'No case preview available', 180)
+                            : 'No case details attached yet.'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`text-sm font-semibold capitalize ${run.status === 'passed' ? 'text-emerald-500' : run.status === 'degraded' ? 'text-amber-500' : run.status === 'failed' ? 'text-rose-500' : 'text-muted-foreground'}`}>{run.status}</p>
-                      <p className="text-sm text-muted-foreground">Score {run.score != null ? Number(run.score).toFixed(2) : 'n/a'}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-4 text-xs text-muted-foreground">
-                    <span>Triggered by {run.triggered_by}</span>
-                    <span>{run.completed_at ? `Completed ${formatDateTime(run.completed_at)}` : 'Still running'}</span>
-                  </div>
-                  <div className="mt-3 rounded-xl border border-dashed border-border bg-background/60 p-3 text-xs text-muted-foreground">
-                    {Array.isArray(run.results) && run.results.length > 0
-                      ? truncateText(run.results[0]?.score_raw || run.results[0]?.actual || run.results[0]?.input || 'No case preview available', 160)
-                      : 'No case details attached yet.'}
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
@@ -216,21 +251,14 @@ export default function EvalsPage() {
   );
 }
 
-function MetricCard({ label, value, detail, tone = 'default' }: { label: string; value: string | number; detail: string; tone?: 'default' | 'success' | 'warning'; }) {
-  const toneClass = tone === 'success' ? 'text-emerald-500' : tone === 'warning' ? 'text-amber-500' : 'text-primary';
+function MetricCard({ label, value, detail, tone = 'neutral' }: { label: string; value: string | number; detail: string; tone?: 'neutral' | 'good' | 'warning' | 'error'; }) {
+  const accent = tone === 'good' ? 'border-l-emerald-500' : tone === 'warning' ? 'border-l-amber-500' : tone === 'error' ? 'border-l-rose-500' : 'border-l-sky-500';
   return (
-    <Card className="border-border/70">
+    <Card className={`border border-zinc-700 bg-[#1a1d27] ${accent} border-l-4`}>
       <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight">{value}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{detail}</p>
-          </div>
-          <div className={`rounded-2xl border border-border bg-muted/30 p-3 ${toneClass}`}>
-            <PlayCircle className="h-5 w-5" />
-          </div>
-        </div>
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="mt-2 text-4xl font-bold tracking-tight text-zinc-50">{value}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{detail}</p>
       </CardContent>
     </Card>
   );

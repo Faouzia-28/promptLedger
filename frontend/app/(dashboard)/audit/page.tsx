@@ -15,10 +15,10 @@ export default function AuditPage() {
   const { data: logs, isLoading } = useAuditLog(skip, 50);
 
   const actionColors: { [key: string]: string } = {
-    create: 'bg-green-500',
-    update: 'bg-blue-500',
+    create: 'bg-emerald-500',
+    update: 'bg-amber-500',
     delete: 'bg-red-500',
-    deploy: 'bg-purple-500',
+    deploy: 'bg-amber-500',
   };
 
   const handleExportEUReport = () => {

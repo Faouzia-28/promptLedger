@@ -106,7 +106,7 @@ export default function EvalRunDetailPage() {
         result.score_raw || '',
       ]),
     ];
-    const csv = rows.map((row) => row.map((value: any) => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
+    const csv = rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -150,9 +150,9 @@ export default function EvalRunDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-3">
-          <Link href="/evals" className={`inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />Back to evals
-          </Link>
+          <Button variant="outline" asChild className="w-fit">
+            <Link href="/evals"><ArrowLeft className="mr-2 h-4 w-4" />Back to evals</Link>
+          </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Eval run detail</h1>
             <p className="text-muted-foreground">{unitName} · {evalSet?.name || 'Unnamed eval set'} · Run {shortId(run.id)}</p>
@@ -220,7 +220,7 @@ export default function EvalRunDetailPage() {
                 )}
               </TabsContent>
               <TabsContent value="raw" className="mt-4">
-                <pre className="max-h-[42rem] overflow-auto rounded-2xl border border-border bg-slate-950 p-4 text-xs leading-relaxed text-slate-100">{safeJsonString(run, 2)}</pre>
+                <pre className="max-h-[42rem] overflow-auto rounded-2xl border border-border bg-[#111111] p-4 text-xs leading-relaxed text-zinc-100">{safeJsonString(run, 2)}</pre>
               </TabsContent>
             </Tabs>
           </CardContent>

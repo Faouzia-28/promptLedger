@@ -108,7 +108,7 @@ export default function MetricsPage() {
             {isLoading ? (
               <Skeleton className="h-56 w-full" />
             ) : (
-              <pre className="max-h-[34rem] overflow-auto rounded-2xl border border-border bg-slate-950 p-4 text-xs leading-relaxed text-slate-100">
+              <pre className="max-h-[34rem] overflow-auto rounded-2xl border border-border bg-[#111111] p-4 text-xs leading-relaxed text-zinc-100">
                 {metricsText || 'No metrics returned.'}
               </pre>
             )}

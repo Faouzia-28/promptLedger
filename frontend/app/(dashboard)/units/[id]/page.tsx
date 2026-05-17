@@ -591,7 +591,7 @@ export default function UnitDetailPage() {
                           <div className="space-y-2">
                             <p className="text-xs font-semibold text-muted-foreground">Test Cases</p>
                             {run.results.map((result: any, idx: number) => (
-                              <details key={idx} className={`rounded-xl border p-3 text-xs ${result.passed ? 'border-green-500/20 bg-green-500/5' : 'border-red-500/20 bg-red-500/5'}`}>
+                              <details key={idx} className={`rounded-xl border p-3 text-xs ${result.passed ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/20 bg-red-500/5'}`}>
                                 <summary className="cursor-pointer list-none">
                                   <div className="flex items-center justify-between gap-2">
                                     <div>

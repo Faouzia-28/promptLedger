@@ -37,8 +37,8 @@ export default function UnitsPage() {
 
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
-      healthy: 'bg-green-500',
-      degraded: 'bg-yellow-500',
+      healthy: 'bg-emerald-500',
+      degraded: 'bg-amber-500',
       critical: 'bg-red-500',
     };
     return colors[(status || '').toLowerCase()] || 'bg-gray-500';

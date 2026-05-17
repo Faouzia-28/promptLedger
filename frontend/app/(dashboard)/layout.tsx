@@ -40,8 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!mounted || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="text-zinc-400">Loading...</div>
       </div>
     );
   }
@@ -51,14 +51,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-zinc-100">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:bg-card">
-        <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
-          <div className="text-2xl font-bold text-primary">PL</div>
+      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-[#1e1e1e] md:bg-[#0a0a0a]">
+        <div className="flex items-center gap-2 px-6 py-4 border-b border-[#1e1e1e]">
+          <div className="text-2xl font-bold text-zinc-100">PL</div>
           <div>
-            <div className="font-semibold text-foreground">PromptLedger</div>
-            <div className="text-xs text-muted-foreground">
+            <div className="font-semibold text-zinc-100">PromptLedger</div>
+            <div className="text-xs text-zinc-400">
               Org {user?.org_id ? user.org_id.slice(0, 8) : 'unknown'}
             </div>
           </div>
@@ -69,7 +69,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
             >
               <item.icon className="w-4 h-4 shrink-0" />
               {item.label}
@@ -77,11 +77,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ))}
         </nav>
 
-        <div className="border-t border-border px-3 py-4 space-y-2">
-          <div className="px-3 py-2 text-xs text-muted-foreground truncate">{user?.email}</div>
+        <div className="border-t border-[#1e1e1e] px-3 py-4 space-y-2">
+          <div className="truncate px-3 py-2 text-xs text-zinc-400">{user?.email}</div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            className="w-full justify-start text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -93,10 +93,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="md:hidden border-b border-border bg-card px-4 py-3 flex items-center justify-between">
+        <div className="md:hidden flex items-center justify-between border-b border-[#1e1e1e] bg-[#0a0a0a] px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="text-xl font-bold text-primary">PL</div>
-            <div className="text-sm font-semibold">PromptLedger</div>
+            <div className="text-xl font-bold text-zinc-100">PL</div>
+            <div className="text-sm font-semibold text-zinc-100">PromptLedger</div>
           </div>
           <Sheet>
             <SheetTrigger
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-background">
+        <main className="flex-1 overflow-auto bg-[#0a0a0a]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
         </main>
       </div>

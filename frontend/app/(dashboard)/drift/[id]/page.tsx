@@ -27,10 +27,10 @@ export default function DriftDetailPage({ params }: { params: { id: string } }) 
   }
 
   const severityColors: { [key: string]: string } = {
-    low: 'bg-blue-500',
-    medium: 'bg-yellow-500',
-    high: 'bg-orange-500',
-    critical: 'bg-red-500',
+    low: 'bg-emerald-500',
+    medium: 'bg-amber-500',
+    high: 'bg-red-500',
+    critical: 'bg-red-600',
   };
 
   return (
