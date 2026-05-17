@@ -63,6 +63,8 @@ jobs:
       - name: Build and test backend
         if: matrix.service == 'backend'
         working-directory: backend
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
         run: |
           python -m venv .venv
           . .venv/bin/activate
