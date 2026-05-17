@@ -93,11 +93,12 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/promptledger_deploy
           chmod 600 ~/.ssh/promptledger_deploy
-          ssh-keyscan -H "${{ secrets.BACKEND_INSTANCE_IP }}" >> ~/.ssh/known_hosts
+          touch ~/.ssh/known_hosts
 
       - name: Sync backend source
         run: |
           rsync -az --delete \
+            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             --exclude '.git' \
             --exclude '.venv' \
             --exclude '__pycache__' \
@@ -107,12 +108,13 @@ jobs:
             backend/ \
             ubuntu@${{ secrets.BACKEND_INSTANCE_IP }}:/opt/promptledger/backend/
           rsync -az \
+            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             docker-compose.prod.yml \
             ubuntu@${{ secrets.BACKEND_INSTANCE_IP }}:/opt/promptledger/docker-compose.prod.yml
 
       - name: Prune backend host copies
         run: |
-          ssh -i ~/.ssh/promptledger_deploy ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
             set -e
             rm -rf /opt/promptledger/frontend /opt/promptledger/frontend_copy_* /opt/promptledger/backend_copy_*
             cd /opt/promptledger
@@ -132,11 +134,12 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/promptledger_deploy
           chmod 600 ~/.ssh/promptledger_deploy
-          ssh-keyscan -H "${{ secrets.FRONTEND_INSTANCE_IP }}" >> ~/.ssh/known_hosts
+          touch ~/.ssh/known_hosts
 
       - name: Sync frontend source
         run: |
           rsync -az --delete \
+            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude '.next' \
@@ -145,7 +148,7 @@ jobs:
 
       - name: Prune frontend host copies
         run: |
-          ssh -i ~/.ssh/promptledger_deploy ubuntu@${{ secrets.FRONTEND_INSTANCE_IP }} '
+          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.FRONTEND_INSTANCE_IP }} '
             set -e
             rm -rf /opt/promptledger/backend /opt/promptledger/backend_copy_* /opt/promptledger/frontend_copy_*
             cd /opt/promptledger/frontend
