@@ -61,12 +61,20 @@ export default function SettingsPage() {
               <p className="mt-1 text-muted-foreground">Open GitHub Sync, edit the integration, paste a new PAT, and save. The backend encrypts it before persistence.</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild>
-                <Link href="/github"><ShieldCheck className="mr-2 h-4 w-4" />Open GitHub Sync</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/metrics"><RefreshCw className="mr-2 h-4 w-4" />Review metrics</Link>
-              </Button>
+              <Link
+                href="/github"
+                className="inline-flex items-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Open GitHub Sync
+              </Link>
+              <Link
+                href="/metrics"
+                className="inline-flex items-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Review metrics
+              </Link>
             </div>
           </CardContent>
         </Card>

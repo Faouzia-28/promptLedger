@@ -150,9 +150,13 @@ export default function EvalRunDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-3">
-          <Button variant="outline" asChild className="w-fit">
-            <Link href="/evals"><ArrowLeft className="mr-2 h-4 w-4" />Back to evals</Link>
-          </Button>
+          <Link
+            href="/evals"
+            className="inline-flex w-fit items-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to evals
+          </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Eval run detail</h1>
             <p className="text-muted-foreground">{unitName} · {evalSet?.name || 'Unnamed eval set'} · Run {shortId(run.id)}</p>

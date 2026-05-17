@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { formatDateTime, shortId } from '@/lib/dashboard';
 import { Activity, BarChart3, GitBranch, PlayCircle, Plus, ShieldAlert, Sparkles, TerminalSquare } from 'lucide-react';
 
+const EMPTY_LIST: never[] = [];
+
 function StatAccent({ tone }: { tone: 'neutral' | 'good' | 'warning' | 'error' }) {
   const classes = {
     neutral: 'border-sky-500/70',
@@ -38,12 +40,13 @@ function StatCard({ label, value, detail, tone }: { label: string; value: string
 
 function QuickActionPill({ href, icon: Icon, label }: { href: string; icon: React.ComponentType<{ className?: string }>; label: string }) {
   return (
-    <Button asChild variant="outline" className="h-10 rounded-full border-zinc-700 bg-zinc-900/80 px-4 text-zinc-100 hover:bg-zinc-800/80 hover:text-white">
-      <Link href={href} className="inline-flex items-center gap-2">
-        <Icon className="h-4 w-4" />
-        {label}
-      </Link>
-    </Button>
+    <Link
+      href={href}
+      className="inline-flex h-10 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-800/80 hover:text-white"
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </Link>
   );
 }
 
@@ -76,9 +79,9 @@ export default function OverviewPage() {
   const [recentRuns, setRecentRuns] = useState<any[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
 
-  const driftEventList = driftEvents ?? [];
-  const integrationList = integrations ?? [];
-  const unitList = units ?? [];
+  const driftEventList = driftEvents ?? EMPTY_LIST;
+  const integrationList = integrations ?? EMPTY_LIST;
+  const unitList = units ?? EMPTY_LIST;
 
   useEffect(() => {
     if (!user?.org_id) return;

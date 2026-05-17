@@ -2,16 +2,12 @@
 
 Add these secrets to your GitHub repository settings (`https://github.com/your-username/promptledger/settings/secrets/actions`):
 
-## AWS Configuration
-
-- **AWS_ROLE_ARN**: ARN of an IAM role that can deploy EC2, S3, etc.
-  - Format: `arn:aws:iam::ACCOUNT_ID:role/ROLE_NAME`
-  - Get from AWS Console → IAM → Roles
+## AWS / SSH Configuration
 
 - **AWS_PRIVATE_KEY**: Private key for SSH access to EC2 instances
   - Generate locally: `ssh-keygen -t rsa -b 4096 -f deploy_key`
-  - Copy the private key content (without passphrase)
-  - Add public key to Terraform: `ssh_public_key = "ssh-rsa ..."`
+  - Copy the private key content into the GitHub secret value
+  - Add the public key to your Terraform / instance bootstrap as needed
 
 ## Instance Configuration
 
@@ -48,9 +44,9 @@ Add these secrets to your GitHub repository settings (`https://github.com/your-u
    ```
 
 2. Add to GitHub Secrets:
-   - Go to: https://github.com/YOUR_USERNAME/promptledger/settings/secrets/actions
-   - Click "New repository secret"
-   - Add each secret above
+  - Go to: https://github.com/YOUR_USERNAME/promptledger/settings/secrets/actions
+  - Click "New repository secret"
+  - Add each secret above
 
 3. After each `terraform apply`, update:
    - BACKEND_INSTANCE_IP
