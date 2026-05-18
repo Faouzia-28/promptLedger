@@ -88,6 +88,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate deploy secrets
+        run: |
+          missing=0
+          if [ -z "${{ secrets.AWS_PRIVATE_KEY }}" ]; then echo "Missing secret: AWS_PRIVATE_KEY"; missing=1; fi
+          if [ -z "${{ secrets.BACKEND_INSTANCE_IP }}" ]; then echo "Missing secret: BACKEND_INSTANCE_IP"; missing=1; fi
+          if [ -z "${{ secrets.API_URL }}" ]; then echo "Missing secret: API_URL"; missing=1; fi
+          if [ $missing -ne 0 ]; then echo "One or more required secrets are missing. Add them in repository settings and retry."; exit 1; fi
+
       - name: Prepare SSH
         run: |
           mkdir -p ~/.ssh
@@ -128,6 +136,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate deploy secrets
+        run: |
+          missing=0
+          if [ -z "${{ secrets.AWS_PRIVATE_KEY }}" ]; then echo "Missing secret: AWS_PRIVATE_KEY"; missing=1; fi
+          if [ -z "${{ secrets.FRONTEND_INSTANCE_IP }}" ]; then echo "Missing secret: FRONTEND_INSTANCE_IP"; missing=1; fi
+          if [ -z "${{ secrets.API_URL }}" ]; then echo "Missing secret: API_URL"; missing=1; fi
+          if [ $missing -ne 0 ]; then echo "One or more required secrets are missing. Add them in repository settings and retry."; exit 1; fi
 
       - name: Prepare SSH
         run: |
