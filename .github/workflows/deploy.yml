@@ -134,7 +134,8 @@ jobs:
         run: |
           set +e
           for attempt in $(seq 1 60); do
-            if ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} 'pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1'; then
+            status=$(ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} 'sudo docker inspect --format "{{.State.Health.Status}}" promptledger-postgres' 2>/dev/null)
+            if [ "$status" = "healthy" ]; then
               exit 0
             fi
             sleep 5
