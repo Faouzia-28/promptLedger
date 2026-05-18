@@ -19,9 +19,10 @@ services:
     restart: always
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U promptledger -d promptledger_db']
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
 
   redis:
     image: redis:7-alpine
