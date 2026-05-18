@@ -227,23 +227,9 @@ jobs:
             exit 0
           fi
 
-          payload=$(cat <<'JSON'
-          {
-            "text": "✅ Deployment successful to ${{ env.PROJECT_NAME }}",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Deployment Successful*\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref }}\nCommit: ${{ github.sha }}"
-                }
-              }
-            ]
-          }
-JSON
-          )
-
-          curl -fsS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK"
+          curl -fsS -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"✅ Deployment successful to ${{ env.PROJECT_NAME }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Deployment Successful*\\nRepo: ${{ github.repository }}\\nBranch: ${{ github.ref }}\\nCommit: ${{ github.sha }}\"}}]}" \
+            "$SLACK_WEBHOOK"
 
       - name: Slack notification (failure)
         if: failure()
@@ -255,20 +241,6 @@ JSON
             exit 0
           fi
 
-          payload=$(cat <<'JSON'
-          {
-            "text": "❌ Deployment failed for ${{ env.PROJECT_NAME }}",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Deployment Failed*\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref }}\nCommit: ${{ github.sha }}"
-                }
-              }
-            ]
-          }
-JSON
-          )
-
-          curl -fsS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK"
+          curl -fsS -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"❌ Deployment failed for ${{ env.PROJECT_NAME }}\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Deployment Failed*\\nRepo: ${{ github.repository }}\\nBranch: ${{ github.ref }}\\nCommit: ${{ github.sha }}\"}}]}" \
+            "$SLACK_WEBHOOK"
