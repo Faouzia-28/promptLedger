@@ -106,7 +106,7 @@ jobs:
       - name: Sync backend source
         run: |
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            -e "ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR" \
             --exclude '.git' \
             --exclude '.venv' \
             --exclude '__pycache__' \
@@ -116,13 +116,13 @@ jobs:
             backend/ \
             ubuntu@${{ secrets.BACKEND_INSTANCE_IP }}:/opt/promptledger/backend/
           rsync -az \
-            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            -e "ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR" \
             docker-compose.prod.yml \
             ubuntu@${{ secrets.BACKEND_INSTANCE_IP }}:/opt/promptledger/docker-compose.prod.yml
 
       - name: Start backend database
         run: |
-          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+          ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
             set -e
             rm -rf /opt/promptledger/frontend /opt/promptledger/frontend_copy_* /opt/promptledger/backend_copy_*
             cd /opt/promptledger
@@ -134,13 +134,13 @@ jobs:
         run: |
           set +e
           for attempt in $(seq 1 60); do
-            if ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} 'pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1'; then
+            if ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} 'pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1'; then
               exit 0
             fi
             sleep 5
           done
 
-          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+          ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
             cd /opt/promptledger
             sudo docker compose -f docker-compose.prod.yml logs --no-color --tail=200 postgres
             sudo docker inspect promptledger-postgres --format "{{json .State}}"
@@ -149,7 +149,7 @@ jobs:
 
       - name: Start backend services
         run: |
-          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+          ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
             set -e
             cd /opt/promptledger
             sudo docker compose -f docker-compose.prod.yml up -d --build --no-deps api celery-worker celery-beat
@@ -181,7 +181,7 @@ jobs:
       - name: Sync frontend source
         run: |
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            -e "ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR" \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude '.next' \
@@ -190,7 +190,7 @@ jobs:
 
       - name: Prune frontend host copies
         run: |
-          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.FRONTEND_INSTANCE_IP }} '
+          ssh -q -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ubuntu@${{ secrets.FRONTEND_INSTANCE_IP }} '
             set -e
             rm -rf /opt/promptledger/backend /opt/promptledger/backend_copy_* /opt/promptledger/frontend_copy_*
             cd /opt/promptledger/frontend
