@@ -351,11 +351,11 @@ export default function GitHubSyncPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="add-unit">Linked behavior unit</Label>
-                <select id="add-unit" value={unitId} onChange={(e) => setUnitId(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="">None</option>
-                  {unitOptions.map((unit: any) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
-                </select>
-              </div>
+                <select id="add-unit" value={unitId} onChange={(e) => setUnitId(e.target.value)} className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[#141414] px-3 py-2 text-sm text-zinc-100">
+                    <option value="">None</option>
+                    {unitOptions.map((unit: any) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
+                  </select>
+                </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-paths">Tracked paths</Label>
@@ -364,7 +364,7 @@ export default function GitHubSyncPage() {
             <div className="space-y-2">
               <Label htmlFor="add-token">GitHub access token</Label>
               <Input id="add-token" type="password" value={githubToken} onChange={(e) => setGithubToken(e.target.value)} placeholder="ghp_..." autoComplete="off" />
-              <p className="text-xs text-muted-foreground">Leave blank if you want to connect later.</p>
+              <p className="text-xs text-zinc-400">Leave blank if you want to connect later.</p>
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
@@ -399,7 +399,7 @@ export default function GitHubSyncPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-unit">Linked behavior unit</Label>
-                <select id="edit-unit" value={editUnitId} onChange={(e) => setEditUnitId(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <select id="edit-unit" value={editUnitId} onChange={(e) => setEditUnitId(e.target.value)} className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[#141414] px-3 py-2 text-sm text-zinc-100">
                   <option value="">None</option>
                   {unitOptions.map((unit: any) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}
                 </select>
@@ -412,7 +412,7 @@ export default function GitHubSyncPage() {
             <div className="space-y-2">
               <Label htmlFor="edit-token">GitHub access token</Label>
               <Input id="edit-token" type="password" value={editGithubToken} onChange={(e) => setEditGithubToken(e.target.value)} placeholder="ghp_..." autoComplete="off" />
-              <p className="text-xs text-muted-foreground">Leave blank to keep the existing encrypted token unchanged.</p>
+              <p className="text-xs text-zinc-400">Leave blank to keep the existing encrypted token unchanged.</p>
             </div>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={editEnabled} onChange={(e) => setEditEnabled(e.target.checked)} />

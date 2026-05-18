@@ -49,7 +49,7 @@ export default function AuditPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Audit Log</h1>
-          <p className="text-muted-foreground">All system activities and compliance records</p>
+            <p className="text-zinc-400">All system activities and compliance records</p>
         </div>
         <Button onClick={handleExportEUReport}>
           <Download className="w-4 h-4 mr-2" />
@@ -58,7 +58,7 @@ export default function AuditPage() {
       </div>
 
       {/* Filters */}
-      <Card className="p-4">
+      <Card className="p-4 border border-[rgba(255,255,255,0.08)] bg-[#141414]">
         <Input placeholder="Search audit log..." className="w-full md:w-64" />
       </Card>
 
@@ -94,14 +94,14 @@ export default function AuditPage() {
                   <TableCell className="text-sm">
                     {log.resource_type}: {log.resource_id}
                   </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
+                  <TableCell className="text-xs text-zinc-400">
                     {log.metadata ? JSON.stringify(log.metadata).substring(0, 50) : '-'}
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-zinc-400 py-8">
                   No audit logs found
                 </TableCell>
               </TableRow>
