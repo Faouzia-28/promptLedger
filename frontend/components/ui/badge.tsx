@@ -9,13 +9,13 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "border border-zinc-700 bg-zinc-800 text-zinc-100 [a]:hover:bg-zinc-700",
+        default: "border border-[#2a2a2a] bg-zinc-800 text-zinc-100 [a]:hover:bg-zinc-700",
         secondary:
-          "border border-zinc-700 bg-zinc-800 text-zinc-100 [a]:hover:bg-zinc-700",
+          "border border-[#2a2a2a] bg-zinc-800 text-zinc-100 [a]:hover:bg-zinc-700",
         destructive:
           "border border-red-400/20 bg-red-400/10 text-red-400 focus-visible:ring-red-400/20 [a]:hover:bg-red-400/15",
         outline:
-          "border border-zinc-700 text-zinc-100 [a]:hover:bg-zinc-800 [a]:hover:text-zinc-100",
+          "border border-[#2a2a2a] text-zinc-100 [a]:hover:bg-zinc-800 [a]:hover:text-zinc-100",
         ghost:
           "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
         link: "text-zinc-100 underline-offset-4 hover:underline",

@@ -17,17 +17,17 @@ const EMPTY_LIST: never[] = [];
 
 function StatAccent({ tone }: { tone: 'neutral' | 'good' | 'warning' | 'error' }) {
   const classes = {
-    neutral: 'border-sky-500/70',
+     neutral: 'border-[#2a2a2a]',
     good: 'border-emerald-500/70',
     warning: 'border-amber-500/70',
-    error: 'border-rose-500/70',
+     error: 'border-rose-500/70',
   }[tone];
   return <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${classes}`} />;
 }
 
 function StatCard({ label, value, detail, tone }: { label: string; value: string | number; detail?: string; tone: 'neutral' | 'good' | 'warning' | 'error' }) {
   return (
-    <Card className="relative overflow-hidden border border-zinc-700 bg-[#1a1d27]">
+    <Card className="relative overflow-hidden border border-[#2a2a2a] bg-[#111111]">
       <StatAccent tone={tone} />
       <CardContent className="p-5 pl-7">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -42,7 +42,7 @@ function QuickActionPill({ href, icon: Icon, label }: { href: string; icon: Reac
   return (
     <Link
       href={href}
-      className="inline-flex h-10 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-800/80 hover:text-white"
+      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#2a2a2a] bg-[#111111] px-4 text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-800/80 hover:text-white"
     >
       <Icon className="h-4 w-4" />
       {label}
@@ -55,7 +55,7 @@ function HealthSparkline({ points }: { points: number[] }) {
   const data = points.map((value, index) => ({ index, value }));
 
   return (
-    <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-3">
+    <div className="rounded-2xl border border-[#2a2a2a] bg-zinc-900/60 p-3">
       <div className="mb-2 flex items-center justify-between gap-3 text-xs text-zinc-400">
         <span>Health trend</span>
         <span className={trendUp ? 'text-emerald-400' : 'text-rose-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
@@ -170,8 +170,8 @@ export default function OverviewPage() {
   }));
 
   return (
-    <div className="space-y-8 bg-[#0f1117] text-zinc-100">
-      <div className="flex flex-col gap-4 border-b border-zinc-700 pb-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-8 bg-[#0a0a0a] text-zinc-100">
+      <div className="flex flex-col gap-4 border-b border-[#2a2a2a] pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-zinc-500">
             <Sparkles className="h-3.5 w-3.5" />
@@ -180,9 +180,9 @@ export default function OverviewPage() {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">{user?.org_id ? shortId(user.org_id, 12) : 'Organization'}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Repos {integrationList.length}</Badge>
-          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Alerts {openDrifts}</Badge>
-          <Badge variant="secondary" className="border-zinc-700 bg-zinc-900 text-zinc-100">Active evals {activeRuns}</Badge>
+          <Badge variant="secondary" className="border-[#2a2a2a] bg-zinc-900 text-zinc-100">Repos {integrationList.length}</Badge>
+          <Badge variant="secondary" className="border-[#2a2a2a] bg-zinc-900 text-zinc-100">Alerts {openDrifts}</Badge>
+          <Badge variant="secondary" className="border-[#2a2a2a] bg-zinc-900 text-zinc-100">Active evals {activeRuns}</Badge>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export default function OverviewPage() {
         <StatCard label="Avg eval score" value={recentRuns.length ? averageScore.toFixed(2) : '0.00'} detail="Across the latest runs" tone="good" />
       </div>
 
-      <div className="flex flex-col gap-3 border-y border-zinc-700 bg-[#1a1d27] px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3 border-y border-[#2a2a2a] bg-[#111111] px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Quick actions</p>
           <p className="mt-1 text-sm text-zinc-300">Compact toolbar for the most common workflows.</p>
@@ -210,7 +210,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
-        <Card className="border-zinc-700 bg-[#1a1d27]">
+        <Card className="border-[#2a2a2a] bg-[#111111]">
           <CardHeader>
             <CardTitle>Recent activity</CardTitle>
             <CardDescription>Latest eval runs with status, score, and timestamp.</CardDescription>
@@ -227,7 +227,7 @@ export default function OverviewPage() {
                   : 'border-amber-500/20 bg-amber-500/10 text-amber-300';
 
               return (
-                <Link key={item.id} href={`/evals/${item.id}`} className="grid grid-cols-[16px_1fr_auto] items-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-900/60 px-4 py-3 transition-colors hover:bg-zinc-800/70">
+                <Link key={item.id} href={`/evals/${item.id}`} className="grid grid-cols-[16px_1fr_auto] items-center gap-3 rounded-2xl border border-[#2a2a2a] bg-zinc-900/60 px-4 py-3 transition-colors hover:bg-zinc-800/70">
                   <span className={`h-2.5 w-2.5 rounded-full ${dot}`} />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-zinc-100">{item.unitName}</p>
@@ -240,19 +240,19 @@ export default function OverviewPage() {
                 </Link>
               );
             }) : (
-              <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/60 p-6 text-sm text-zinc-400">Once you sync a repo or run an eval, the feed will populate here automatically.</div>
+              <div className="rounded-2xl border border-dashed border-[#2a2a2a] bg-zinc-900/60 p-6 text-sm text-zinc-400">Once you sync a repo or run an eval, the feed will populate here automatically.</div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-700 bg-[#1a1d27]">
+        <Card className="border-[#2a2a2a] bg-[#111111]">
           <CardHeader>
             <CardTitle>Health trend</CardTitle>
             <CardDescription>Last 10 runs at a glance.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <HealthSparkline points={trendPoints} />
-            <div className="grid gap-3 rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 text-xs text-zinc-300">
+            <div className="grid gap-3 rounded-2xl border border-[#2a2a2a] bg-zinc-900/60 p-4 text-xs text-zinc-300">
               <div className="flex items-center justify-between gap-3"><span>Open drift</span><span className="font-medium text-zinc-100">{openDrifts}</span></div>
               <div className="flex items-center justify-between gap-3"><span>Active evals</span><span className="font-medium text-zinc-100">{activeRuns}</span></div>
               <div className="flex items-center justify-between gap-3"><span>PATs</span><span className="font-medium text-zinc-100">{tokenReadyCount}</span></div>

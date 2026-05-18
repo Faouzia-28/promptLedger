@@ -123,7 +123,7 @@ export default function EvalsPage() {
     if (status === 'failed') return 'border border-red-400/20 bg-red-400/10 text-red-400';
     if (status === 'passed') return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
     if (status === 'degraded') return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
-    return 'border border-zinc-700 bg-zinc-900 text-zinc-200';
+    return 'border border-[#2a2a2a] bg-zinc-900 text-zinc-200';
   };
 
   return (
@@ -203,13 +203,13 @@ export default function EvalsPage() {
               {filteredRuns.map((run) => {
                 const score = Number(run.score ?? 0);
                 return (
-                  <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-3xl border border-zinc-700 bg-zinc-900/60 p-5 transition-colors hover:bg-zinc-800/50 hover:border-zinc-600">
+                  <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-3xl border border-[#2a2a2a] bg-zinc-900/60 p-5 transition-colors hover:bg-zinc-800/50 hover:border-zinc-600">
                     <div className="space-y-3">
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="font-semibold text-zinc-100">{run.unit_name || 'Unknown unit'}</p>
-                          <Badge variant="secondary" className="border-zinc-700 bg-zinc-800 text-zinc-100">{run.eval_set_name}</Badge>
-                          <Badge variant="outline" className="border-zinc-700 bg-zinc-900 text-zinc-100">Version {shortId(run.version_id, 6)}</Badge>
+                          <Badge variant="secondary" className="border-[#2a2a2a] bg-zinc-800 text-zinc-100">{run.eval_set_name}</Badge>
+                          <Badge variant="outline" className="border-[#2a2a2a] bg-zinc-900 text-zinc-100">Version {shortId(run.version_id, 6)}</Badge>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
                           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(run.status)}`}>
@@ -228,7 +228,7 @@ export default function EvalsPage() {
                         <span>· created {formatDateTime(run.created_at)}</span>
                       </div>
 
-                      <div className="max-w-full overflow-hidden rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200">
+                      <div className="max-w-full overflow-hidden rounded-xl border border-[#2a2a2a] bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200">
                         <div className="truncate">
                           {Array.isArray(run.results) && run.results.length > 0
                             ? truncateText(run.results[0]?.score_raw || run.results[0]?.actual || run.results[0]?.input || 'No case preview available', 180)
@@ -252,9 +252,9 @@ export default function EvalsPage() {
 }
 
 function MetricCard({ label, value, detail, tone = 'neutral' }: { label: string; value: string | number; detail: string; tone?: 'neutral' | 'good' | 'warning' | 'error'; }) {
-  const accent = tone === 'good' ? 'border-l-emerald-500' : tone === 'warning' ? 'border-l-amber-500' : tone === 'error' ? 'border-l-rose-500' : 'border-l-sky-500';
+  const accent = tone === 'good' ? 'border-l-emerald-500' : tone === 'warning' ? 'border-l-amber-500' : tone === 'error' ? 'border-l-rose-500' : 'border-l-[#2a2a2a]';
   return (
-    <Card className={`border border-zinc-700 bg-[#1a1d27] ${accent} border-l-4`}>
+    <Card className={`border border-[#2a2a2a] bg-[#111111] ${accent} border-l-4`}>
       <CardContent className="p-5">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
         <p className="mt-2 text-4xl font-bold tracking-tight text-zinc-50">{value}</p>
