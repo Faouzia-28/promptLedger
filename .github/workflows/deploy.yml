@@ -170,9 +170,13 @@ jobs:
             cd /opt/promptledger/frontend
             npm ci
             NEXT_PUBLIC_API_URL=${{ secrets.API_URL }} npm run build
-            pm2 restart promptledger-frontend
-            pm2 save
-            pm2 list
+            sudo systemctl daemon-reload
+            if systemctl list-unit-files | grep -q "^promptledger-frontend.service"; then
+              sudo systemctl restart promptledger-frontend
+            else
+              sudo systemctl enable --now promptledger-frontend
+            fi
+            sudo systemctl status promptledger-frontend --no-pager --full
           '
 
   smoke-tests:
