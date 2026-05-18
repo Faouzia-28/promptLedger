@@ -126,8 +126,13 @@ jobs:
             set -e
             rm -rf /opt/promptledger/frontend /opt/promptledger/frontend_copy_* /opt/promptledger/backend_copy_*
             cd /opt/promptledger
-            sudo docker compose -f docker-compose.prod.yml up -d postgres redis
-            timeout 180 bash -lc "until sudo docker exec promptledger-postgres pg_isready -U promptledger -d promptledger_db; do sleep 5; done"
+            sudo docker compose -f docker-compose.prod.yml up -d --force-recreate postgres redis
+            if ! timeout 300 bash -lc "until pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1; do sleep 5; done"; then
+              sudo docker compose -f docker-compose.prod.yml logs --no-color --tail=200 postgres
+              sudo docker inspect promptledger-postgres --format '{{json .State}}'
+              exit 1
+            fi
+            sudo docker compose -f docker-compose.prod.yml ps postgres redis
             sudo docker compose -f docker-compose.prod.yml up -d --build --no-deps api celery-worker celery-beat
             sudo docker compose -f docker-compose.prod.yml ps
           '
