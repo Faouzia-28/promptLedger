@@ -120,19 +120,38 @@ jobs:
             docker-compose.prod.yml \
             ubuntu@${{ secrets.BACKEND_INSTANCE_IP }}:/opt/promptledger/docker-compose.prod.yml
 
-      - name: Prune backend host copies
+      - name: Start backend database
         run: |
           ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
             set -e
             rm -rf /opt/promptledger/frontend /opt/promptledger/frontend_copy_* /opt/promptledger/backend_copy_*
             cd /opt/promptledger
             sudo docker compose -f docker-compose.prod.yml up -d --force-recreate postgres redis
-            if ! timeout 300 bash -lc "until pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1; do sleep 5; done"; then
-              sudo docker compose -f docker-compose.prod.yml logs --no-color --tail=200 postgres
-              sudo docker inspect promptledger-postgres --format '{{json .State}}'
-              exit 1
-            fi
             sudo docker compose -f docker-compose.prod.yml ps postgres redis
+          '
+
+      - name: Wait for backend database
+        run: |
+          set +e
+          for attempt in $(seq 1 60); do
+            if ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} 'pg_isready -h 127.0.0.1 -p 5432 -U promptledger -d promptledger_db >/dev/null 2>&1'; then
+              exit 0
+            fi
+            sleep 5
+          done
+
+          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+            cd /opt/promptledger
+            sudo docker compose -f docker-compose.prod.yml logs --no-color --tail=200 postgres
+            sudo docker inspect promptledger-postgres --format "{{json .State}}"
+          '
+          exit 1
+
+      - name: Start backend services
+        run: |
+          ssh -i ~/.ssh/promptledger_deploy -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${{ secrets.BACKEND_INSTANCE_IP }} '
+            set -e
+            cd /opt/promptledger
             sudo docker compose -f docker-compose.prod.yml up -d --build --no-deps api celery-worker celery-beat
             sudo docker compose -f docker-compose.prod.yml ps
           '
