@@ -8,13 +8,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#171717] text-zinc-100 border border-[#2a2a2a] hover:bg-[#1f1f1f]",
+        default: "border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)]",
         outline:
-          "border-[#2a2a2a] bg-[#111111] text-zinc-100 hover:bg-[#171717] hover:text-zinc-100",
+          "border border-[rgba(255,255,255,0.08)] bg-transparent text-zinc-100 hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] hover:text-zinc-100",
         secondary:
-          "bg-[#171717] text-zinc-100 hover:bg-[#1f1f1f]",
+          "border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:bg-[rgba(255,255,255,0.08)]",
         ghost:
-          "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+          "text-zinc-400 hover:bg-[rgba(255,255,255,0.03)] hover:text-zinc-100",
         destructive:
           "border border-red-400/20 bg-red-400/10 text-red-400 hover:bg-red-400/15 focus-visible:border-red-400/40 focus-visible:ring-red-400/20",
         link: "text-zinc-100 underline-offset-4 hover:underline",

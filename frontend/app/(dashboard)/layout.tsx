@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCurrentUser } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,11 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isLoading, isAuthenticated } = useCurrentUser();
   const [mounted, setMounted] = useState(false);
+
+  const isActivePath = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     setMounted(true);
@@ -53,9 +56,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-zinc-100">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-[#1e1e1e] md:bg-[#0a0a0a]">
-        <div className="flex items-center gap-2 px-6 py-4 border-b border-[#1e1e1e]">
-          <div className="text-2xl font-bold text-zinc-100">PL</div>
+      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-[rgba(255,255,255,0.06)] md:bg-[#0f0f0f]">
+        <div className="flex items-center gap-2 border-b border-[rgba(255,255,255,0.06)] px-6 py-4">
+          <div className="rounded-xl bg-[#111111] px-2.5 py-1.5 text-2xl font-light tracking-[-0.02em] text-zinc-100 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_0_16px_rgba(255,255,255,0.05)]">PL</div>
           <div>
             <div className="font-semibold text-zinc-100">PromptLedger</div>
             <div className="text-xs text-zinc-400">
@@ -69,7 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+              className={`flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-all ${isActivePath(item.href) ? 'border-l-2 border-l-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.06)] pl-[14px] text-zinc-100' : 'border-l-2 border-l-transparent px-3 text-zinc-400 hover:bg-[rgba(255,255,255,0.03)] hover:text-zinc-100'}`}
             >
               <item.icon className="w-4 h-4 shrink-0" />
               {item.label}
@@ -77,11 +80,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ))}
         </nav>
 
-        <div className="border-t border-[#1e1e1e] px-3 py-4 space-y-2">
+        <div className="border-t border-[rgba(255,255,255,0.06)] px-3 py-4 space-y-2">
           <div className="truncate px-3 py-2 text-xs text-zinc-400">{user?.email}</div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+            className="w-full justify-start text-zinc-400 hover:bg-[rgba(255,255,255,0.03)] hover:text-zinc-100"
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -93,9 +96,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="md:hidden flex items-center justify-between border-b border-[#1e1e1e] bg-[#0a0a0a] px-4 py-3">
+        <div className="md:hidden flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] bg-[rgba(10,10,10,0.72)] px-4 py-3 backdrop-blur-[8px]">
           <div className="flex items-center gap-2">
-            <div className="text-xl font-bold text-zinc-100">PL</div>
+            <div className="rounded-xl bg-[#111111] px-2 py-1 text-xl font-light tracking-[-0.02em] text-zinc-100 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_0_16px_rgba(255,255,255,0.05)]">PL</div>
             <div className="text-sm font-semibold text-zinc-100">PromptLedger</div>
           </div>
           <Sheet>
@@ -106,13 +109,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <Menu className="w-5 h-5" />
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side="left" className="w-64 border-r border-[rgba(255,255,255,0.06)] bg-[#0f0f0f] p-0">
               <nav className="space-y-1 px-3 py-4">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    className={`flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-all ${isActivePath(item.href) ? 'border-l-2 border-l-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.06)] pl-[14px] text-zinc-100' : 'border-l-2 border-l-transparent px-3 text-zinc-400 hover:bg-[rgba(255,255,255,0.03)] hover:text-zinc-100'}`}
                   >
                     <item.icon className="w-4 h-4 shrink-0" />
                     {item.label}

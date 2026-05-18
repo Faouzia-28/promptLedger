@@ -156,7 +156,7 @@ export default function EvalsPage() {
         <MetricCard label="Degraded" value={totals.degraded} detail="Needs review" tone="warning" />
       </div>
 
-      <Card className="border-border/70">
+      <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><Filter className="h-5 w-5 text-primary" />Filters</CardTitle>
           <CardDescription>Use a couple of filters at a time so the run list stays readable.</CardDescription>
@@ -190,7 +190,7 @@ export default function EvalsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/70">
+      <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <CardHeader>
           <CardTitle>Eval run index</CardTitle>
           <CardDescription>Every row links to a detailed run page with per-case outputs, scores, and notes.</CardDescription>
@@ -203,13 +203,13 @@ export default function EvalsPage() {
               {filteredRuns.map((run) => {
                 const score = Number(run.score ?? 0);
                 return (
-                  <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-3xl border border-[#2a2a2a] bg-zinc-900/60 p-5 transition-colors hover:bg-zinc-800/50 hover:border-zinc-600">
+                  <Link key={run.id} href={`/evals/${run.id}`} className="block rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-5 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[#1c1c1c]">
                     <div className="space-y-3">
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="font-semibold text-zinc-100">{run.unit_name || 'Unknown unit'}</p>
-                          <Badge variant="secondary" className="border-[#2a2a2a] bg-zinc-800 text-zinc-100">{run.eval_set_name}</Badge>
-                          <Badge variant="outline" className="border-[#2a2a2a] bg-zinc-900 text-zinc-100">Version {shortId(run.version_id, 6)}</Badge>
+                          <Badge variant="secondary" className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100">{run.eval_set_name}</Badge>
+                          <Badge variant="outline" className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100">Version {shortId(run.version_id, 6)}</Badge>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
                           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusBadgeClass(run.status)}`}>
@@ -228,7 +228,7 @@ export default function EvalsPage() {
                         <span>· created {formatDateTime(run.created_at)}</span>
                       </div>
 
-                      <div className="max-w-full overflow-hidden rounded-xl border border-[#2a2a2a] bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200">
+                      <div className="max-w-full overflow-hidden rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#141414] px-3 py-2 font-mono text-sm text-zinc-200 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
                         <div className="truncate">
                           {Array.isArray(run.results) && run.results.length > 0
                             ? truncateText(run.results[0]?.score_raw || run.results[0]?.actual || run.results[0]?.input || 'No case preview available', 180)
@@ -241,7 +241,7 @@ export default function EvalsPage() {
               })}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] bg-[#141414] p-8 text-center text-sm text-zinc-400">
               No runs match the current filters.
             </div>
           )}
@@ -254,11 +254,11 @@ export default function EvalsPage() {
 function MetricCard({ label, value, detail, tone = 'neutral' }: { label: string; value: string | number; detail: string; tone?: 'neutral' | 'good' | 'warning' | 'error'; }) {
   const accent = tone === 'good' ? 'border-l-emerald-500' : tone === 'warning' ? 'border-l-amber-500' : tone === 'error' ? 'border-l-rose-500' : 'border-l-[#2a2a2a]';
   return (
-    <Card className={`border border-[#2a2a2a] bg-[#111111] ${accent} border-l-4`}>
+    <Card className={`border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)] ${accent} border-l-4`}>
       <CardContent className="p-5">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className="mt-2 text-4xl font-bold tracking-tight text-zinc-50">{value}</p>
-        <p className="mt-2 text-sm text-muted-foreground">{detail}</p>
+        <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">{label}</p>
+        <p className="mt-2 text-[2.75rem] font-light tracking-[-0.02em] text-zinc-50">{value}</p>
+        <p className="mt-2 text-sm text-zinc-400">{detail}</p>
       </CardContent>
     </Card>
   );

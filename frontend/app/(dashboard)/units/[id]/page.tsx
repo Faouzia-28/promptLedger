@@ -283,14 +283,14 @@ export default function UnitDetailPage() {
   }
 
   if (!unit) {
-    return <Card className="p-6 text-center text-muted-foreground">Unit not found</Card>;
+    return <Card className="p-6 text-center text-zinc-400 border border-[rgba(255,255,255,0.08)] bg-[#141414]">Unit not found</Card>;
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{unit.name}</h1>
-        <p className="text-muted-foreground">{unit.description}</p>
+        <p className="text-zinc-400">{unit.description}</p>
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
@@ -302,23 +302,23 @@ export default function UnitDetailPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <Card className="p-6">
+          <Card className="p-6 border border-[rgba(255,255,255,0.08)] bg-[#141414]">
             <h3 className="font-semibold mb-4">Unit Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Type</p>
+                <p className="text-sm text-zinc-400">Type</p>
                 <p className="font-medium capitalize">{unit.unit_type || unit.type || 'llm'}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Status</p>
+                <p className="text-sm text-zinc-400">Status</p>
                 <p className="font-medium capitalize">{unit.status || 'healthy'}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Created</p>
+                <p className="text-sm text-zinc-400">Created</p>
                 <p className="font-medium text-sm">{formatDateTime(unit.created_at)}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Versions</p>
+                <p className="text-sm text-zinc-400">Versions</p>
                 <p className="font-medium">{unit.version_count || 0}</p>
               </div>
             </div>
@@ -327,19 +327,19 @@ export default function UnitDetailPage() {
 
         <TabsContent value="versions" className="space-y-4">
           <Card className="p-6">
-            <div className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-end lg:justify-between">
+                <div className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <h3 className="font-semibold">Versions</h3>
-                <p className="text-sm text-muted-foreground">Normalize, sort, and inspect versions without forcing the JSON open on first render.</p>
+                    <p className="text-sm text-zinc-400">Normalize, sort, and inspect versions without forcing the JSON open on first render.</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <div className="space-y-1">
-                  <Label htmlFor="version-sort" className="text-xs uppercase tracking-wide text-muted-foreground">Sort</Label>
+                  <Label htmlFor="version-sort" className="text-xs uppercase tracking-wide text-zinc-400">Sort</Label>
                   <select
                     id="version-sort"
                     value={versionSort}
                     onChange={(e) => setVersionSort(e.target.value as 'newest' | 'oldest' | 'number')}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                    className="h-9 rounded-md border border-[rgba(255,255,255,0.08)] bg-[#141414] px-3 text-sm text-zinc-100"
                   >
                     <option value="newest">Newest</option>
                     <option value="oldest">Oldest</option>
@@ -355,7 +355,7 @@ export default function UnitDetailPage() {
             ) : sortedVersions.length > 0 ? (
               <div className="space-y-3">
                 {sortedVersions.map((v: any) => (
-                  <div key={v.id} className={`rounded-2xl border p-4 transition-colors ${activeVersionId === v.id ? 'border-primary bg-muted/40' : 'border-border'}`}>
+                  <div key={v.id} className={`rounded-2xl p-4 transition-colors ${activeVersionId === v.id ? 'border-primary bg-[#141414] shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]' : 'border-[rgba(255,255,255,0.08)] bg-[#141414]'}`}>
                     <button
                       type="button"
                       onClick={() => setActiveVersionId(v.id)}
@@ -363,11 +363,11 @@ export default function UnitDetailPage() {
                     >
                       <div>
                         <p className="font-medium">Version {v.version_number}</p>
-                        <p className="text-xs text-muted-foreground">{formatDateTime(v.created_at)}</p>
+                        <p className="text-xs text-zinc-400">{formatDateTime(v.created_at)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground capitalize">{v.status}</p>
-                        <p className="text-xs text-muted-foreground">{v.source_provider || 'manual'} · {shortId(v.git_commit, 10)}</p>
+                        <p className="text-sm text-zinc-400 capitalize">{v.status}</p>
+                        <p className="text-xs text-zinc-400">{v.source_provider || 'manual'} · {shortId(v.git_commit, 10)}</p>
                       </div>
                     </button>
 

@@ -86,25 +86,25 @@ export default function UnitsPage() {
   if (!units || units.length === 0) {
     return (
       <>
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">Behavior Units</h1>
-            <p className="text-muted-foreground">Monitor and manage your LLM behavior units</p>
+            <p className="text-zinc-400">Monitor and manage your LLM behavior units</p>
           </div>
-          <Button onClick={() => setCreateOpen(true)}>
+          <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
             <Plus className="w-4 h-4 mr-2" />
             Create Unit
           </Button>
         </div>
 
-        <Card className="p-12 text-center space-y-4">
+        <Card className="p-12 text-center space-y-4 border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
           <p className="text-lg font-semibold">No behavior units yet</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-zinc-400">
             Start by creating a unit, then push two versions and run a semantic diff to establish your baseline.
           </p>
-          <div className="mx-auto max-w-lg rounded-md border border-border bg-muted/20 p-4 text-left text-sm">
+          <div className="mx-auto max-w-lg rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 text-left text-sm shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
             <p className="font-medium mb-2">Recommended first-run flow</p>
-            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+            <ol className="list-decimal list-inside space-y-1 text-zinc-400">
               <li>Create one unit for your main prompt</li>
               <li>Push version 1 (current prompt)</li>
               <li>Push version 2 (candidate prompt)</li>
@@ -112,14 +112,14 @@ export default function UnitsPage() {
               <li>Run semantic diff and eval</li>
             </ol>
           </div>
-          <Button onClick={() => setCreateOpen(true)}>
+          <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
             <Plus className="w-4 h-4 mr-2" />
             Create Your First Unit
           </Button>
         </Card>
 
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogContent>
+          <DialogContent className="border border-[rgba(255,255,255,0.08)] bg-[#141414] text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
             <form onSubmit={handleCreateUnit} className="space-y-4">
               <DialogHeader>
                 <DialogTitle>Create Behavior Unit</DialogTitle>
@@ -154,7 +154,7 @@ export default function UnitsPage() {
                   id="unit-type"
                   value={unitType}
                   onChange={(e) => setUnitType(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
+                  className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-zinc-100"
                 >
                   <option value="llm">LLM</option>
                   <option value="completion">Completion</option>
@@ -182,13 +182,13 @@ export default function UnitsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-8 bg-[#0a0a0a] text-zinc-100">
+      <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <h1 className="text-3xl font-bold">Behavior Units</h1>
-          <p className="text-muted-foreground">Monitor and manage your LLM behavior units</p>
+          <p className="text-zinc-400">Monitor and manage your LLM behavior units</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
           <Plus className="w-4 h-4 mr-2" />
           Create Unit
         </Button>
@@ -197,7 +197,7 @@ export default function UnitsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {units.map((unit: any) => (
           <Link key={unit.id} href={`/units/${unit.id}`}>
-            <Card className="p-6 hover:border-primary transition-colors cursor-pointer h-full">
+            <Card className="p-6 h-full cursor-pointer border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[#1c1c1c]">
               {(() => {
                 const unitTypeValue = unit.unit_type || unit.type || 'llm';
                 const unitStatusValue = unit.status || 'healthy';
@@ -207,24 +207,24 @@ export default function UnitsPage() {
                   <>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <Icon className="w-7 h-7 text-primary shrink-0" />
+                        <Icon className="w-7 h-7 text-zinc-100 shrink-0" />
                         <div>
                           <h3 className="font-semibold text-foreground">{unit.name}</h3>
-                          <p className="text-xs text-muted-foreground">{unitTypeValue}</p>
+                          <p className="text-xs text-zinc-400">{unitTypeValue}</p>
                         </div>
                       </div>
                       <div className={`w-3 h-3 rounded-full ${getStatusColor(unitStatusValue)}`} />
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{unit.description}</p>
+                    <p className="text-sm text-zinc-400 mb-4 line-clamp-2">{unit.description}</p>
 
-                    <div className="space-y-2 border-t border-border pt-4">
+                    <div className="space-y-2 border-t border-[rgba(255,255,255,0.08)] pt-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Versions</span>
+                        <span className="text-zinc-400">Versions</span>
                         <span className="font-medium">{unit.version_count || 0}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Status</span>
+                        <span className="text-zinc-400">Status</span>
                         <Badge variant="outline" className="capitalize">
                           {unitStatusValue}
                         </Badge>
@@ -239,7 +239,7 @@ export default function UnitsPage() {
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent>
+        <DialogContent className="border border-[rgba(255,255,255,0.08)] bg-[#141414] text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
           <form onSubmit={handleCreateUnit} className="space-y-4">
             <DialogHeader>
               <DialogTitle>Create Behavior Unit</DialogTitle>
@@ -270,11 +270,11 @@ export default function UnitsPage() {
 
             <div className="space-y-2">
               <Label htmlFor="unit-type">Unit Type</Label>
-              <select
+                <select
                 id="unit-type"
                 value={unitType}
                 onChange={(e) => setUnitType(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
+                  className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-zinc-100"
               >
                 <option value="llm">LLM</option>
                 <option value="completion">Completion</option>

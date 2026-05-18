@@ -226,7 +226,7 @@ export default function GitHubSyncPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">GitHub Sync</h1>
           <p className="mt-1 text-sm text-zinc-400">Connected repositories, PAT state, and manual sync controls are all visible here.</p>
         </div>
-        <Button onClick={openAddDialog} className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-4 text-zinc-950 hover:bg-white">
+        <Button onClick={openAddDialog} className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
           <Plus className="h-4 w-4" />
           Add repository
         </Button>
@@ -240,50 +240,50 @@ export default function GitHubSyncPage() {
         </Card>
       )}
 
-      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-[#2a2a2a] bg-[#111111] px-4 py-3 text-sm text-zinc-300">
+      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] px-4 py-3 text-sm text-zinc-300 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-2"><span className="text-xs uppercase tracking-wide text-zinc-500">Connected repos</span><span className="text-lg font-semibold text-zinc-50">{integrationCount}</span></div>
-        <div className="h-5 w-px bg-zinc-700" />
+        <div className="h-5 w-px bg-[rgba(255,255,255,0.08)]" />
         <div className="flex items-center gap-2"><span className="text-xs uppercase tracking-wide text-zinc-500">Enabled integrations</span><span className="text-lg font-semibold text-zinc-50">{enabledCount}</span></div>
-        <div className="h-5 w-px bg-zinc-700" />
+        <div className="h-5 w-px bg-[rgba(255,255,255,0.08)]" />
         <div className="flex items-center gap-2"><span className="text-xs uppercase tracking-wide text-zinc-500">PATs stored</span><span className="text-lg font-semibold text-zinc-50">{tokenCount}</span></div>
       </div>
 
-      <Card className="border-[#2a2a2a] bg-[#111111] text-zinc-100">
+      <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <CardContent className="space-y-4 p-5">
-          <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#2a2a2a] bg-zinc-900/60 px-4 py-3 text-sm text-zinc-300">
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] px-4 py-3 text-sm text-zinc-300 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
             <div>
               <span className="font-medium text-zinc-100">Webhook configured at /webhooks/github</span>
               <span className="ml-2 text-zinc-500">— add this to push events</span>
             </div>
-            <button type="button" onClick={copyWebhookUrl} className="rounded-full border border-[#2a2a2a] bg-zinc-900 px-3 py-1.5 text-xs text-zinc-100 hover:bg-zinc-800">
+            <button type="button" onClick={copyWebhookUrl} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-xs text-zinc-100 transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
               {copiedWebhookUrl ? 'Copied' : 'Show URL'}
             </button>
           </div>
-          <details className="rounded-2xl border border-[#2a2a2a] bg-zinc-900/60 p-4 text-sm text-zinc-300">
+          <details className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 text-sm text-zinc-300 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-zinc-100">
               <span className="font-medium">Setup instructions</span>
               <ChevronDown className="h-4 w-4 text-zinc-500" />
             </summary>
             <div className="mt-4 space-y-3">
-              <div className="rounded-2xl border border-[#2a2a2a] bg-zinc-950/60 p-3">
+              <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
                 <p className="font-medium text-zinc-100">1. Add or edit an integration</p>
                 <p className="mt-1 text-zinc-400">Choose a repository, select a branch, and store a PAT only if the repo needs it.</p>
               </div>
-              <div className="rounded-2xl border border-[#2a2a2a] bg-zinc-950/60 p-3">
+              <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
                 <p className="font-medium text-zinc-100">2. Trigger a push or manual sync</p>
                 <p className="mt-1 text-zinc-400">Manual sync is helpful for backfills, debugging, and first-time setup.</p>
               </div>
-              <div className="rounded-2xl border border-[#2a2a2a] bg-zinc-950/60 p-3">
+              <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
                 <p className="font-medium text-zinc-100">3. Watch versions and evals appear</p>
                 <p className="mt-1 text-zinc-400">Each sync can produce a behavior version and kick off an evaluation automatically.</p>
               </div>
-              <div className="rounded-2xl border border-[#2a2a2a] bg-zinc-950/60 p-3 font-mono text-xs break-all text-zinc-200">{webhookUrl}</div>
+              <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 font-mono text-xs break-all text-zinc-200 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">{webhookUrl}</div>
             </div>
           </details>
         </CardContent>
       </Card>
 
-      <Card className="border-[#2a2a2a] bg-[#111111] text-zinc-100">
+      <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <CardHeader>
           <CardTitle>Connected repositories</CardTitle>
           <CardDescription>The status chips now show something meaningful instead of just token/no-token text.</CardDescription>
@@ -292,7 +292,7 @@ export default function GitHubSyncPage() {
           {integrationList.length > 0 ? (
             <div className="space-y-4">
               {integrationList.map((integration: any) => (
-                <div key={integration.id} className="rounded-3xl border border-[#2a2a2a] bg-zinc-900/60 p-6 space-y-4">
+                <div key={integration.id} className="rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-6 space-y-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -305,22 +305,22 @@ export default function GitHubSyncPage() {
                       <RepoBadges hasToken={Boolean(integration.has_github_token)} enabled={Boolean(integration.enabled)} linkedName={integration.unit?.name || integration.unit_name} />
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button type="button" variant="outline" size="sm" onClick={() => openSyncDialog(integration)} className="border-[#2a2a2a] bg-zinc-900 text-zinc-100 hover:bg-zinc-800 hover:text-white">
+                      <Button type="button" variant="outline" size="sm" onClick={() => openSyncDialog(integration)} className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
                         <RefreshCw className="mr-2 h-4 w-4" />Manual sync
                       </Button>
-                      <Button type="button" variant="outline" size="sm" onClick={() => openEditDialog(integration)} className="border-[#2a2a2a] bg-zinc-900 text-zinc-100 hover:bg-zinc-800 hover:text-white">
+                      <Button type="button" variant="outline" size="sm" onClick={() => openEditDialog(integration)} className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
                         <PencilLine className="mr-2 h-4 w-4" />Edit
                       </Button>
                     </div>
                   </div>
 
-                  <div className="h-px bg-zinc-700" />
+                  <div className="h-px bg-[rgba(255,255,255,0.08)]" />
 
                   <div className="space-y-2">
                     <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Tracked paths</p>
                     <div className="flex flex-wrap gap-2">
                       {toLines(integration.tracked_paths).length > 0 ? toLines(integration.tracked_paths).map((path: string) => (
-                        <span key={path} className="rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-xs text-zinc-200">{path}</span>
+                        <span key={path} className="rounded-md border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 font-mono text-xs text-zinc-200">{path}</span>
                       )) : <span className="text-sm text-zinc-400">No tracked paths configured</span>}
                     </div>
                   </div>
@@ -328,7 +328,7 @@ export default function GitHubSyncPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-[#2a2a2a] bg-zinc-900/60 p-6 text-sm text-zinc-400">No repositories are connected yet.</div>
+            <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] bg-[#141414] p-6 text-sm text-zinc-400">No repositories are connected yet.</div>
           )}
         </CardContent>
       </Card>
@@ -469,7 +469,7 @@ export default function GitHubSyncPage() {
             <input type="checkbox" checked={syncTriggerEval} onChange={(e) => setSyncTriggerEval(e.target.checked)} />
             Trigger eval after version creation
           </label>
-            <div className="rounded-2xl border border-dashed border-[#2a2a2a] bg-zinc-900/60 p-4 text-sm text-zinc-400 mt-4">
+            <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 text-sm text-zinc-400 mt-4">
             If the content box is left empty, the backend will fetch the file from GitHub using the stored PAT or the override PAT you provide here.
           </div>
           <DialogFooter>

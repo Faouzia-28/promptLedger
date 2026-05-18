@@ -25,20 +25,20 @@ export default function DriftPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-8 bg-[#0a0a0a] text-zinc-100">
+      <div className="border-b border-white/10 pb-4">
         <h1 className="text-3xl font-bold">Drift Events</h1>
-        <p className="text-muted-foreground">Monitor behavioral drift in your LLM units</p>
+        <p className="text-zinc-400">Monitor behavioral drift in your LLM units</p>
       </div>
 
       {/* Filters */}
-      <Card className="p-4 flex flex-col md:flex-row gap-4">
+      <Card className="flex flex-col gap-4 border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)] md:flex-row">
         <div className="flex-1">
-          <label className="text-sm text-muted-foreground block mb-2">Severity</label>
+          <label className="mb-2 block text-sm text-zinc-400">Severity</label>
           <select 
             value={severity} 
             onChange={(e) => setSeverity(e.target.value)}
-            className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
+            className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-zinc-100"
           >
             <option value="">All Severities</option>
             <option value="low">Low</option>
@@ -48,11 +48,11 @@ export default function DriftPage() {
           </select>
         </div>
         <div className="flex-1">
-          <label className="text-sm text-muted-foreground block mb-2">Status</label>
+          <label className="mb-2 block text-sm text-zinc-400">Status</label>
           <select 
             value={resolved} 
             onChange={(e) => setResolved(e.target.value)}
-            className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
+            className="w-full rounded-md border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-2 text-zinc-100"
           >
             <option value="">All Status</option>
             <option value="false">Open</option>
@@ -62,7 +62,7 @@ export default function DriftPage() {
       </Card>
 
       {/* Events Table */}
-      <Card>
+      <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -116,7 +116,7 @@ export default function DriftPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="py-8 text-center text-zinc-400">
                   No drift events detected
                 </TableCell>
               </TableRow>

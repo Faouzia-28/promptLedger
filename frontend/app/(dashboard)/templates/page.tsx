@@ -142,11 +142,11 @@ export default function ScoringTemplatesPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="space-y-8 bg-[#0a0a0a] text-zinc-100">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Scoring Templates</h1>
-          <p className="text-muted-foreground">Edit the live scorer prompt, preview the formatted message, and keep a rollback history.</p>
+          <p className="text-zinc-400">Edit the live scorer prompt, preview the formatted message, and keep a rollback history.</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">Runtime store</Badge>
@@ -155,9 +155,9 @@ export default function ScoringTemplatesPage() {
       </div>
 
       {(message || error) && (
-        <Card className={error ? 'border-destructive/40 bg-destructive/5' : 'border-primary/40 bg-primary/5'}>
+        <Card className={error ? 'border border-red-400/20 bg-red-400/10' : 'border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)]'}>
           <CardContent className="p-4 text-sm">
-            <p className={error ? 'text-destructive' : 'text-foreground'}>{error || message}</p>
+            <p className={error ? 'text-red-300' : 'text-zinc-100'}>{error || message}</p>
           </CardContent>
         </Card>
       )}
@@ -172,9 +172,9 @@ export default function ScoringTemplatesPage() {
 
         <TabsContent value="editor" className="mt-4 space-y-4">
           <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-            <Card className="border-border/70">
+            <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> System prompt</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-zinc-100" /> System prompt</CardTitle>
                 <CardDescription>The system prompt should anchor the scorer behavior and force the response format you expect.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -182,9 +182,9 @@ export default function ScoringTemplatesPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/70">
+            <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><ArrowLeftRight className="h-5 w-5 text-primary" /> User template</CardTitle>
+                <CardTitle className="flex items-center gap-2"><ArrowLeftRight className="h-5 w-5 text-zinc-100" /> User template</CardTitle>
                 <CardDescription>Supports the same placeholders used by the backend scorer: <code>{'{input}'}</code>, <code>{'{criteria}'}</code>, and <code>{'{response}'}</code>.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -224,29 +224,29 @@ export default function ScoringTemplatesPage() {
                   <Label htmlFor="test-response">Response</Label>
                   <Textarea id="test-response" value={testResponse} onChange={(e) => setTestResponse(e.target.value)} className="min-h-28" />
                 </div>
-                <div className="rounded-2xl border border-border bg-muted/20 p-4">
-                  <p className="text-sm font-medium">Approximate fallback score</p>
-                  <p className="mt-1 text-3xl font-semibold">{localScore.toFixed(2)}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">This is a local preview of the scoring fallback so you can see how the UI will react when the scorer cannot parse a strict JSON response.</p>
+                <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
+                  <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Approximate fallback score</p>
+                  <p className="mt-1 text-[2.75rem] font-light tracking-[-0.02em]">{localScore.toFixed(2)}</p>
+                  <p className="mt-2 text-sm text-zinc-400">This is a local preview of the scoring fallback so you can see how the UI will react when the scorer cannot parse a strict JSON response.</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-border/70">
+            <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
               <CardHeader>
                 <CardTitle>Formatted message</CardTitle>
                 <CardDescription>Exactly what the backend scorer receives after placeholder substitution.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-2xl border border-border bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">System message</p>
+                <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
+                  <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">System message</p>
                   <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap text-sm">{previewMessage.system}</pre>
                 </div>
-                <div className="rounded-2xl border border-border bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">User message</p>
+                <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
+                  <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">User message</p>
                   <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap text-sm">{previewMessage.user}</pre>
                 </div>
-                <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-4 text-sm text-muted-foreground">
+                <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 text-sm text-zinc-400">
                   Expected JSON shape: <code>{safeJsonString({ overall: 0.92, rationale: 'short explanation' })}</code>
                 </div>
               </CardContent>
@@ -255,14 +255,14 @@ export default function ScoringTemplatesPage() {
         </TabsContent>
 
         <TabsContent value="history" className="mt-4 space-y-4">
-          <Card className="border-border/70">
+          <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
             <CardHeader>
               <CardTitle>Versioned templates</CardTitle>
               <CardDescription>Snapshots are stored locally so you can roll back quickly during experiments.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {history.length > 0 ? history.map((item, index) => (
-                <div key={`${item.saved_at}-${index}`} className="rounded-2xl border border-border bg-muted/20 p-4">
+                <div key={`${item.saved_at}-${index}`} className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="font-medium">Snapshot {index + 1}</p>
@@ -279,7 +279,7 @@ export default function ScoringTemplatesPage() {
                   <pre className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{item.user_template}</pre>
                 </div>
               )) : (
-                <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No local template history yet. Save a template to start building rollback snapshots.</div>
+                <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] p-6 text-sm text-zinc-400">No local template history yet. Save a template to start building rollback snapshots.</div>
               )}
             </CardContent>
           </Card>
@@ -288,34 +288,34 @@ export default function ScoringTemplatesPage() {
         <TabsContent value="fuzz" className="mt-4 space-y-4">
           <div className="grid gap-4 xl:grid-cols-3">
             {generatedCases.map((sample) => (
-              <Card key={sample.input} className="border-border/70">
+              <Card key={sample.input} className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base"><FlaskConical className="h-4 w-4 text-primary" /> Mock case</CardTitle>
+                  <CardTitle className="flex items-center gap-2 text-base"><FlaskConical className="h-4 w-4 text-zinc-100" /> Mock case</CardTitle>
                   <CardDescription>{sample.input}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Criteria</p>
-                    <p className="mt-1 text-muted-foreground">{sample.criteria}</p>
+                    <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Criteria</p>
+                    <p className="mt-1 text-zinc-400">{sample.criteria}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Response</p>
-                    <p className="mt-1 text-muted-foreground">{sample.response}</p>
+                    <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Response</p>
+                    <p className="mt-1 text-zinc-400">{sample.response}</p>
                   </div>
-                  <div className="rounded-2xl border border-border bg-muted/20 p-3">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Fallback score</p>
-                    <p className="mt-1 text-2xl font-semibold">{fallbackHeuristic(sample.input, sample.criteria, sample.response).toFixed(2)}</p>
+                  <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
+                    <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Fallback score</p>
+                    <p className="mt-1 text-[2rem] font-light tracking-[-0.02em]">{fallbackHeuristic(sample.input, sample.criteria, sample.response).toFixed(2)}</p>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <Card className="border-border/70">
+          <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
             <CardHeader>
               <CardTitle>Guidance</CardTitle>
               <CardDescription>Use this page to confirm the scorer prompt is stable before you regrade large batches.</CardDescription>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground space-y-2">
+            <CardContent className="space-y-2 text-sm text-zinc-400">
               <p>• Keep the system prompt strict and machine-readable.</p>
               <p>• Keep the user template small enough that the LLM can reliably return JSON.</p>
               <p>• Use the live preview before saving, especially when changing the output schema.</p>

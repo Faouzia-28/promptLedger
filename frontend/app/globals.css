@@ -79,7 +79,7 @@
   --sidebar-primary-foreground: #f4f4f5;
   --sidebar-accent: #171717;
   --sidebar-accent-foreground: #f4f4f5;
-  --sidebar-border: #1e1e1e;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #52525b;
 }
 
@@ -113,7 +113,7 @@
   --sidebar-primary-foreground: #f4f4f5;
   --sidebar-accent: #171717;
   --sidebar-accent-foreground: #f4f4f5;
-  --sidebar-border: #1e1e1e;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #52525b;
 }
 
