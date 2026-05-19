@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Line, LineChart, ResponsiveContainer } from 'recharts';
+import { Line, LineChart, ResponsiveContainer, Area, ReferenceDot } from 'recharts';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useBehaviorUnits, useDriftEvents, useGitHubIntegrations, useCurrentUser } from '@/lib/hooks';
@@ -194,17 +194,10 @@ function HealthSparkline({ points }: { points: number[] }) {
               strokeLinejoin="round"
             />
             {/* subtle area under the line for visibility */}
-            <defs>
-              {/* placeholder; Recharts Area uses separate component but gradient defined here for potential use */}
-            </defs>
-            {/* draw a small marker for the latest point */}
+            <Area type="monotone" dataKey="value" stroke="none" fill="url(#area-gradient)" />
+            {/* draw a small marker for the latest point only */}
             {data.length > 0 && (
-              <Line
-                type="monotone"
-                dataKey="value"
-                strokeOpacity={0}
-                dot={{ stroke: '#fff', strokeWidth: 2, r: 3, fill: '#fff' }}
-              />
+              <ReferenceDot x={data[data.length - 1].index} y={data[data.length - 1].value} r={3} fill="#fff" stroke="#fff" />
             )}
           </LineChart>
         </ResponsiveContainer>
