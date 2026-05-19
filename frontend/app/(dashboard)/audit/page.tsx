@@ -51,7 +51,7 @@ export default function AuditPage() {
           <h1 className="text-3xl font-bold">Audit Log</h1>
             <p className="text-zinc-400">All system activities and compliance records</p>
         </div>
-        <Button onClick={handleExportEUReport}>
+        <Button onClick={handleExportEUReport} className="soft-glow">
           <Download className="w-4 h-4 mr-2" />
           Export EU AI Act Report
         </Button>

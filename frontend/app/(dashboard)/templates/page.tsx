@@ -194,7 +194,7 @@ export default function ScoringTemplatesPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button onClick={saveTemplates} disabled={busy || isLoading}>
+            <Button onClick={saveTemplates} disabled={busy || isLoading} className="soft-glow">
               {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save templates
             </Button>

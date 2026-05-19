@@ -46,8 +46,8 @@ export default function MetricsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Observability & Metrics</h1>
           <p className="text-zinc-400">Scorer latency, parse failures, and live throughput from the backend Prometheus endpoint.</p>
         </div>
-        <Button onClick={loadMetrics} disabled={isLoading} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+        <Button onClick={loadMetrics} disabled={isLoading} className="soft-glow rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
+          <RefreshCw className={`mr-2 h-4 w-4 glow-icon ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
@@ -60,9 +60,9 @@ export default function MetricsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard icon={Activity} label="Scorer calls" value={snapshot.calls.toLocaleString()} detail="All scoring invocations" />
-        <MetricCard icon={ShieldAlert} label="Parse failures" value={snapshot.parseFailures.toLocaleString()} detail={`${parseFailureRate.toFixed(2)}% failure rate`} tone="warning" />
-        <MetricCard icon={TimerReset} label="Latency p95" value={`${snapshot.latencyP95.toFixed(2)}s`} detail="Approximate histogram p95" tone="success" />
-        <MetricCard icon={Gauge} label="Success rate" value={`${snapshot.successRate.toFixed(1)}%`} detail={`Updated ${lastUpdated ? formatDateTime(lastUpdated) : 'just now'}`} tone="success" />
+        <MetricCard icon={ShieldAlert} label="Parse failures" value={snapshot.parseFailures.toLocaleString()} detail={`${parseFailureRate.toFixed(2)}% failure rate`} />
+        <MetricCard icon={TimerReset} label="Latency p95" value={`${snapshot.latencyP95.toFixed(2)}s`} detail="Approximate histogram p95" />
+        <MetricCard icon={Gauge} label="Success rate" value={`${snapshot.successRate.toFixed(1)}%`} detail={`Updated ${lastUpdated ? formatDateTime(lastUpdated) : 'just now'}`} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
@@ -119,11 +119,9 @@ export default function MetricsPage() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, detail, tone = 'default' }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; detail: string; tone?: 'default' | 'warning' | 'success'; }) {
-  const toneClass = tone === 'warning' ? 'text-amber-500' : tone === 'success' ? 'text-emerald-500' : 'text-primary';
-
+function MetricCard({ icon: Icon, label, value, detail }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; detail: string; }) {
   return (
-    <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
+    <Card className="border border-[#1e1e1e] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_10px_24px_rgba(0,0,0,0.34)]">
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -131,8 +129,8 @@ function MetricCard({ icon: Icon, label, value, detail, tone = 'default' }: { ic
             <p className="mt-2 text-[2.75rem] font-light tracking-[-0.02em] text-zinc-50">{value}</p>
             <p className="mt-2 text-sm text-zinc-400">{detail}</p>
           </div>
-          <div className={`rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-3 ${toneClass}`}>
-            <Icon className="h-5 w-5" />
+          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-3 text-zinc-100">
+            <Icon className="h-5 w-5 text-zinc-100" />
           </div>
         </div>
       </CardContent>

@@ -91,7 +91,7 @@ export default function UnitsPage() {
             <h1 className="text-3xl font-bold">Behavior Units</h1>
             <p className="text-zinc-400">Monitor and manage your LLM behavior units</p>
           </div>
-          <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
+          <Button onClick={() => setCreateOpen(true)} className="soft-glow rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
             <Plus className="w-4 h-4 mr-2" />
             Create Unit
           </Button>
@@ -112,7 +112,7 @@ export default function UnitsPage() {
               <li>Run semantic diff and eval</li>
             </ol>
           </div>
-          <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
+          <Button onClick={() => setCreateOpen(true)} className="soft-glow rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
             <Plus className="w-4 h-4 mr-2" />
             Create Your First Unit
           </Button>
@@ -188,7 +188,7 @@ export default function UnitsPage() {
           <h1 className="text-3xl font-bold">Behavior Units</h1>
           <p className="text-zinc-400">Monitor and manage your LLM behavior units</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
+        <Button onClick={() => setCreateOpen(true)} className="soft-glow rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)]">
           <Plus className="w-4 h-4 mr-2" />
           Create Unit
         </Button>

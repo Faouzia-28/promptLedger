@@ -11,28 +11,135 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDateTime, shortId } from '@/lib/dashboard';
-import { Activity, BarChart3, GitBranch, PlayCircle, Plus, ShieldAlert, Sparkles, TerminalSquare } from 'lucide-react';
+import { Activity, BarChart3, Bell, GitBranch, PlayCircle, Plus, ShieldAlert, Sparkles, TerminalSquare } from 'lucide-react';
 
 const EMPTY_LIST: never[] = [];
 
-function StatAccent({ tone }: { tone: 'neutral' | 'good' | 'warning' | 'error' }) {
-  const classes = {
-     neutral: 'border-[#2a2a2a]',
-    good: 'border-emerald-500/70',
-    warning: 'border-amber-500/70',
-     error: 'border-rose-500/70',
-  }[tone];
-  return <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${classes}`} />;
+type StatVariant = 'units' | 'runs' | 'drift' | 'repos';
+
+function StatArtwork({ variant }: { variant: StatVariant }) {
+  if (variant === 'units') {
+    return (
+      <svg viewBox="0 0 120 120" className="h-full w-full" aria-hidden="true">
+        <defs>
+          <linearGradient id="unit-face-a" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#d4d4d8" stopOpacity="0.18" />
+          </linearGradient>
+          <linearGradient id="unit-face-b" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.24" />
+            <stop offset="100%" stopColor="#71717a" stopOpacity="0.1" />
+          </linearGradient>
+        </defs>
+        <g opacity="0.92">
+          <g transform="translate(22 18)">
+            <path d="M20 18l18-10 18 10-18 10z" fill="url(#unit-face-a)"/>
+            <path d="M20 18v20l18 10V28z" fill="url(#unit-face-b)"/>
+            <path d="M56 18v20l-18 10V28z" fill="#bcbcbc" fillOpacity="0.11"/>
+          </g>
+          <g transform="translate(52 34)">
+            <path d="M20 18l18-10 18 10-18 10z" fill="url(#unit-face-a)"/>
+            <path d="M20 18v20l18 10V28z" fill="url(#unit-face-b)"/>
+            <path d="M56 18v20l-18 10V28z" fill="#bcbcbc" fillOpacity="0.1"/>
+          </g>
+          <g transform="translate(37 58)">
+            <path d="M20 18l18-10 18 10-18 10z" fill="url(#unit-face-a)"/>
+            <path d="M20 18v20l18 10V28z" fill="url(#unit-face-b)"/>
+            <path d="M56 18v20l-18 10V28z" fill="#bcbcbc" fillOpacity="0.1"/>
+          </g>
+        </g>
+      </svg>
+    );
+  }
+
+  if (variant === 'runs') {
+    return (
+      <svg viewBox="0 0 120 120" className="h-full w-full" aria-hidden="true">
+        <defs>
+          <linearGradient id="run-face" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.72" />
+            <stop offset="100%" stopColor="#d4d4d8" stopOpacity="0.2" />
+          </linearGradient>
+          <linearGradient id="run-side" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fafafa" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#71717a" stopOpacity="0.1" />
+          </linearGradient>
+        </defs>
+        <g transform="translate(18 16)">
+          <circle cx="40" cy="40" r="28" fill="none" stroke="url(#run-face)" strokeWidth="8" />
+          <path d="M40 22v18l12 7" fill="none" stroke="#ffffff" strokeOpacity="0.55" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M10 24h16M8 34h12M10 44h14" stroke="#ffffff" strokeOpacity="0.16" strokeWidth="5" strokeLinecap="round" />
+          <path d="M60 18l11-7" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="5" strokeLinecap="round" />
+          <path d="M64 28l14-5" stroke="#ffffff" strokeOpacity="0.16" strokeWidth="5" strokeLinecap="round" />
+          <path d="M66 38l12-1" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="5" strokeLinecap="round" />
+          <circle cx="40" cy="40" r="8" fill="url(#run-face)" />
+        </g>
+      </svg>
+    );
+  }
+
+  if (variant === 'drift') {
+    return (
+      <svg viewBox="0 0 120 120" className="h-full w-full" aria-hidden="true">
+        <defs>
+          <linearGradient id="doc-front" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.68" />
+            <stop offset="100%" stopColor="#d4d4d8" stopOpacity="0.2" />
+          </linearGradient>
+          <linearGradient id="doc-back" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#71717a" stopOpacity="0.08" />
+          </linearGradient>
+        </defs>
+        <g transform="translate(20 18)">
+          <path d="M20 16h28l10 10v30H20z" fill="url(#doc-back)" />
+          <path d="M28 24h28l10 10v30H28z" fill="url(#doc-front)" />
+          <path d="M56 24v10h10" fill="none" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="4" strokeLinejoin="round" />
+          <path d="M35 42h20M35 49h14" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="4" strokeLinecap="round" />
+          <path d="M70 38c8 0 12 4 12 10s-4 10-12 10" fill="none" stroke="#ffffff" strokeOpacity="0.5" strokeWidth="6" strokeLinecap="round" />
+          <path d="M70 42l8 6-8 6" fill="none" stroke="#ffffff" strokeOpacity="0.5" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M22 70l12-12" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="5" strokeLinecap="round" />
+        </g>
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 120 120" className="h-full w-full" aria-hidden="true">
+      <defs>
+        <linearGradient id="repo-face" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="#d4d4d8" stopOpacity="0.2" />
+        </linearGradient>
+        <linearGradient id="repo-side" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#71717a" stopOpacity="0.08" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(16 18)">
+        <path d="M30 22c0-8 6-14 14-14h12c8 0 14 6 14 14s-6 14-14 14H44c-8 0-14-6-14-14z" fill="none" stroke="url(#repo-face)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M42 22c0-4 3-7 7-7h12c4 0 7 3 7 7s-3 7-7 7H49c-4 0-7-3-7-7z" fill="none" stroke="url(#repo-side)" strokeWidth="7" strokeLinecap="round" />
+        <path d="M44 36c0 8-6 14-14 14H18c-8 0-14-6-14-14s6-14 14-14h12c8 0 14 6 14 14z" fill="none" stroke="url(#repo-face)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M32 36c0 4-3 7-7 7H13c-4 0-7-3-7-7s3-7 7-7h12c4 0 7 3 7 7z" fill="none" stroke="url(#repo-side)" strokeWidth="7" strokeLinecap="round" />
+        <path d="M30 16l11 12M30 44l11-12" stroke="#ffffff" strokeOpacity="0.28" strokeWidth="5" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
 }
 
-function StatCard({ label, value, detail, tone }: { label: string; value: string | number; detail?: string; tone: 'neutral' | 'good' | 'warning' | 'error' }) {
+function StatCard({ label, value, detail, variant }: { label: string; value: string | number; detail?: string; variant: StatVariant }) {
   return (
-    <Card className="relative overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
-      <StatAccent tone={tone} />
-      <CardContent className="p-5 pl-7">
-        <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">{label}</p>
-        <p className="mt-2 text-[2.75rem] font-light tracking-[-0.02em] text-zinc-50">{value}</p>
-        {detail ? <p className="mt-2 text-sm text-zinc-400">{detail}</p> : null}
+    <Card className="group relative overflow-hidden border border-[#1e1e1e] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_10px_24px_rgba(0,0,0,0.34)] transition-all duration-300 ease-out hover:border-[#2a2a2a] hover:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_14px_30px_rgba(0,0,0,0.42)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02),transparent_68%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[160px] w-[160px] -translate-x-1/2 -translate-y-1/2 opacity-15 transition-all duration-300 ease-out group-hover:opacity-11 group-hover:scale-105">
+        <StatArtwork variant={variant} />
+      </div>
+      <CardContent className="relative z-10 flex min-h-[176px] flex-col p-4">
+        <p className="text-[10px] uppercase tracking-[0.16em] text-white/38">{label}</p>
+        <div className="mt-auto pb-2 pt-8">
+          <p className="text-[2.35rem] font-light tracking-[-0.03em] text-zinc-50">{value}</p>
+        </div>
+        <p className="text-sm text-zinc-400">{detail}</p>
       </CardContent>
     </Card>
   );
@@ -42,9 +149,9 @@ function QuickActionPill({ href, icon: Icon, label }: { href: string; icon: Reac
   return (
     <Link
       href={href}
-      className="inline-flex h-10 items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-sm font-medium text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100"
+      className="soft-glow inline-flex h-10 items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-sm font-medium text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100"
     >
-      <Icon className="h-4 w-4" />
+      <Icon className="h-4 w-4 glow-icon" />
       {label}
     </Link>
   );
@@ -55,19 +162,74 @@ function HealthSparkline({ points }: { points: number[] }) {
   const data = points.map((value, index) => ({ index, value }));
 
   return (
-    <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-3 shadow-[0_0_12px_rgba(74,222,128,0.15),0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
-      <div className="mb-2 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.1em] text-white/35">
+    <div className="relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.012))] p-4 shadow-[0_0_12px_rgba(255,255,255,0.04),0_1px_0_rgba(255,255,255,0.08)_inset,0_16px_36px_rgba(0,0,0,0.38)]">
+      <div className="mb-3 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.1em] text-white/35">
         <span>Health trend</span>
-        <span className={trendUp ? 'text-emerald-400' : 'text-rose-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
+        <span className={trendUp ? 'text-zinc-300' : 'text-zinc-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
       </div>
-      <div className="h-[60px] w-[200px] max-w-full">
+      <div className="h-[92px] w-full max-w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <Line type="monotone" dataKey="value" stroke={trendUp ? '#22c55e' : '#f43f5e'} strokeWidth={2.5} dot={false} />
+            <defs>
+              <filter id="glow-line">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={trendUp ? '#e5e7eb' : '#cbd5e1'}
+              strokeWidth={3}
+              dot={false}
+              filter="url(#glow-line)"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
+  );
+}
+
+function NotificationBell() {
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Notifications"
+        className="group inline-flex items-center justify-center border-0 bg-transparent p-0 text-zinc-100 transition-transform duration-200 ease-out hover:scale-110"
+      >
+        <Bell
+          className="h-[22px] w-[22px] text-white transition-[filter,transform] duration-200 ease-out"
+          style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.4))' }}
+        />
+      </button>
+      <style jsx>{`
+        button:hover :global(svg) {
+          filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+        }
+
+        button :global(svg) {
+          animation: bellGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes bellGlow {
+          0%,
+          100% {
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+          }
+
+          50% {
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+          }
+        }
+      `}</style>
+    </>
   );
 }
 
@@ -168,30 +330,59 @@ export default function OverviewPage() {
     time: run.completed_at || run.created_at,
     unitName: run.unit_name || 'Unknown unit',
   }));
+  const displayName = useMemo(() => {
+    const email = user?.email || '';
+    const localPart = email.includes('@') ? email.split('@')[0] : '';
+    return user?.name || user?.full_name || user?.display_name || localPart || 'there';
+  }, [user]);
 
   return (
-    <div className="space-y-8 bg-[#0a0a0a] text-zinc-100">
+    <div className="space-y-8 bg-[#0d0d0d] text-zinc-100">
       <div className="flex flex-col gap-4 border-b border-white/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-white/35">
             <Sparkles className="h-3.5 w-3.5" />
             PromptLedger dashboard
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">{user?.org_id ? shortId(user.org_id, 12) : 'Organization'}</h1>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">Hello {displayName}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{user?.org_id ? shortId(user.org_id, 12) : 'Organization'} overview</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100">Repos {integrationList.length}</Badge>
-          <Badge variant="secondary" className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100">Alerts {openDrifts}</Badge>
-          <Badge variant="secondary" className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100">Active evals {activeRuns}</Badge>
+        <div className="flex items-start justify-end lg:pt-2">
+          <NotificationBell />
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
-        <StatCard label="Behavior units" value={unitList.length} detail="Registered prompt surfaces" tone="neutral" />
-        <StatCard label="Eval runs" value={recentRuns.length} detail={recentLoading ? 'Loading live runs...' : `${activeRuns} still active`} tone="neutral" />
-        <StatCard label="Open drift" value={openDrifts} detail={`${healthScore}% health score`} tone={openDrifts ? 'warning' : 'good'} />
-        <StatCard label="Connected repos" value={integrationList.length} detail={`${tokenReadyCount} PATs stored securely`} tone={tokenReadyCount ? 'good' : 'warning'} />
-        <StatCard label="Avg eval score" value={recentRuns.length ? averageScore.toFixed(2) : '0.00'} detail="Across the latest runs" tone="good" />
+      <Card className="relative overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] shadow-[0_0_14px_rgba(255,255,255,0.05),0_1px_0_rgba(255,255,255,0.08)_inset,0_16px_42px_rgba(0,0,0,0.36)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.03),transparent_30%)]" />
+        <CardHeader className="relative flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle>Health dashboard</CardTitle>
+            <CardDescription>Highlighted status for the latest runs, drift, and score trend.</CardDescription>
+          </div>
+          <Badge variant="secondary" className="w-fit border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] text-zinc-100">{healthScore}% health</Badge>
+        </CardHeader>
+        <CardContent className="relative grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(240px,0.9fr)]">
+          <HealthSparkline points={trendPoints} />
+          <div className="grid gap-3">
+            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f0f] p-4 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset]">
+              <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Behavior units</p>
+              <p className="mt-2 text-3xl font-light tracking-[-0.02em] text-zinc-50">{unitList.length}</p>
+              <p className="mt-1 text-sm text-zinc-400">Registered prompt surfaces</p>
+            </div>
+            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f0f] p-4 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset]">
+              <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">Open drift</p>
+              <p className="mt-2 text-3xl font-light tracking-[-0.02em] text-zinc-50">{openDrifts}</p>
+              <p className="mt-1 text-sm text-zinc-400">{healthScore}% health score</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Behavior units" value={unitList.length} detail="Registered prompt surfaces" variant="units" />
+        <StatCard label="Eval runs" value={recentRuns.length} detail={recentLoading ? 'Loading live runs...' : `${activeRuns} still active`} variant="runs" />
+        <StatCard label="Open drift" value={openDrifts} detail={`${healthScore}% health score`} variant="drift" />
+        <StatCard label="Connected repos" value={integrationList.length} detail={`${tokenReadyCount} PATs stored securely`} variant="repos" />
       </div>
 
       <div className="flex flex-col gap-3 border-y border-white/10 bg-[#141414] px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
@@ -209,7 +400,7 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+      <div className="grid gap-6">
         <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
           <CardHeader>
             <CardTitle>Recent activity</CardTitle>
@@ -242,21 +433,6 @@ export default function OverviewPage() {
             }) : (
               <div className="rounded-2xl border border-dashed border-[rgba(255,255,255,0.08)] bg-[#141414] p-6 text-sm text-zinc-400">Once you sync a repo or run an eval, the feed will populate here automatically.</div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card className="border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_0_12px_rgba(74,222,128,0.15),0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)]">
-          <CardHeader>
-            <CardTitle>Health trend</CardTitle>
-            <CardDescription>Last 10 runs at a glance.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <HealthSparkline points={trendPoints} />
-            <div className="grid gap-3 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#141414] p-4 text-xs text-zinc-300 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]">
-              <div className="flex items-center justify-between gap-3"><span>Open drift</span><span className="font-medium text-zinc-100">{openDrifts}</span></div>
-              <div className="flex items-center justify-between gap-3"><span>Active evals</span><span className="font-medium text-zinc-100">{activeRuns}</span></div>
-              <div className="flex items-center justify-between gap-3"><span>PATs</span><span className="font-medium text-zinc-100">{tokenReadyCount}</span></div>
-            </div>
           </CardContent>
         </Card>
       </div>

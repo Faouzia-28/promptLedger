@@ -128,3 +128,26 @@
     @apply font-sans;
   }
 }
+
+/* Soft glow utilities for subtle highlights */
+.soft-glow {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  box-shadow: 0 0 8px rgba(255,255,255,0.035), 0 6px 18px rgba(0,0,0,0.45) inset;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.soft-glow:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 14px rgba(255,255,255,0.06), 0 14px 34px rgba(0,0,0,0.5) inset;
+}
+.soft-glow .glow-icon {
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.14));
+}
+
+@keyframes softPulse {
+  0% { box-shadow: 0 0 6px rgba(255,255,255,0.02); }
+  50% { box-shadow: 0 0 12px rgba(255,255,255,0.045); }
+  100% { box-shadow: 0 0 6px rgba(255,255,255,0.02); }
+}
+.soft-glow-pulse {
+  animation: softPulse 3s ease-in-out infinite;
+}

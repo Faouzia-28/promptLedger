@@ -111,19 +111,14 @@ export default function EvalsPage() {
   };
 
   const scoreBadgeClass = (score: number | null | undefined) => {
-    const tone = scoreTone(score);
-    return tone === 'emerald'
-      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300'
-      : tone === 'amber'
-        ? 'border-amber-500/20 bg-amber-500/10 text-amber-300'
-        : 'border-rose-500/20 bg-rose-500/10 text-rose-300';
+    return 'border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100';
   };
 
   const statusBadgeClass = (status: string) => {
-    if (status === 'failed') return 'border border-red-400/20 bg-red-400/10 text-red-400';
-    if (status === 'passed') return 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
-    if (status === 'degraded') return 'border border-amber-500/20 bg-amber-500/10 text-amber-300';
-    return 'border border-[#2a2a2a] bg-zinc-900 text-zinc-200';
+    if (status === 'failed') return 'border border-[rgba(255,255,255,0.08)] bg-[#1a1a1a] text-zinc-100';
+    if (status === 'passed') return 'border border-[rgba(255,255,255,0.08)] bg-[#1a1a1a] text-zinc-100';
+    if (status === 'degraded') return 'border border-[rgba(255,255,255,0.08)] bg-[#1a1a1a] text-zinc-100';
+    return 'border border-[rgba(255,255,255,0.08)] bg-[#1a1a1a] text-zinc-200';
   };
 
   return (
@@ -252,9 +247,8 @@ export default function EvalsPage() {
 }
 
 function MetricCard({ label, value, detail, tone = 'neutral' }: { label: string; value: string | number; detail: string; tone?: 'neutral' | 'good' | 'warning' | 'error'; }) {
-  const accent = tone === 'good' ? 'border-l-emerald-500' : tone === 'warning' ? 'border-l-amber-500' : tone === 'error' ? 'border-l-rose-500' : 'border-l-[#2a2a2a]';
   return (
-    <Card className={`border border-[rgba(255,255,255,0.08)] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_4px_24px_rgba(0,0,0,0.4)] ${accent} border-l-4`}>
+    <Card className="border border-[#1e1e1e] bg-[#141414] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_10px_24px_rgba(0,0,0,0.34)]">
       <CardContent className="p-5">
         <p className="text-[11px] uppercase tracking-[0.1em] text-white/35">{label}</p>
         <p className="mt-2 text-[2.75rem] font-light tracking-[-0.02em] text-zinc-50">{value}</p>

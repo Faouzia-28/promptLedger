@@ -226,7 +226,7 @@ export default function GitHubSyncPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">GitHub Sync</h1>
           <p className="mt-1 text-sm text-zinc-400">Connected repositories, PAT state, and manual sync controls are all visible here.</p>
         </div>
-        <Button onClick={openAddDialog} className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
+        <Button onClick={openAddDialog} className="soft-glow inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
           <Plus className="h-4 w-4" />
           Add repository
         </Button>
@@ -373,7 +373,7 @@ export default function GitHubSyncPage() {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setAddRepoOpen(false)} disabled={busy}>Cancel</Button>
-            <Button type="button" onClick={() => saveIntegration('add')} disabled={busy || !repoFullName.trim()}>
+            <Button type="button" onClick={() => saveIntegration('add')} disabled={busy || !repoFullName.trim()} className="soft-glow">
               {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save repository
             </Button>
@@ -421,7 +421,7 @@ export default function GitHubSyncPage() {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setEditingIntegration(null)} disabled={busy}>Cancel</Button>
-            <Button type="button" onClick={() => saveIntegration('edit')} disabled={busy || !editRepoFullName.trim()}>
+            <Button type="button" onClick={() => saveIntegration('edit')} disabled={busy || !editRepoFullName.trim()} className="soft-glow">
               {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save integration
             </Button>
@@ -474,7 +474,7 @@ export default function GitHubSyncPage() {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setSyncIntegration(null)} disabled={busy}>Cancel</Button>
-            <Button type="button" onClick={runManualSync} disabled={busy || !syncIntegration}>
+            <Button type="button" onClick={runManualSync} disabled={busy || !syncIntegration} className="soft-glow">
               {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Run manual sync
             </Button>
