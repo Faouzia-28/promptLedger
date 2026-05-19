@@ -323,6 +323,12 @@ export default function UnitDetailPage() {
               </div>
             </div>
           </Card>
+          {sortedVersions.length === 0 && (
+            <Card className="p-6 border border-dashed border-[rgba(255,255,255,0.06)] bg-[#111111] text-zinc-400">
+              <h4 className="font-medium mb-2">No versions yet</h4>
+              <p className="text-sm">This unit has no pushed versions. Create a version from the Versions tab or push one from the editor to populate run history and charts.</p>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="versions" className="space-y-4">

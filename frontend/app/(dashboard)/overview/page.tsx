@@ -167,10 +167,14 @@ function HealthSparkline({ points }: { points: number[] }) {
         <span>Health trend</span>
         <span className={trendUp ? 'text-zinc-300' : 'text-zinc-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
       </div>
-      <div className="h-[92px] w-full max-w-full">
+      <div className="h-[120px] w-full max-w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
             <defs>
+              <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.01" />
+              </linearGradient>
               <filter id="glow-line">
                 <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
                 <feMerge>
@@ -182,13 +186,26 @@ function HealthSparkline({ points }: { points: number[] }) {
             <Line
               type="monotone"
               dataKey="value"
-              stroke={trendUp ? '#e5e7eb' : '#cbd5e1'}
+              stroke={trendUp ? '#fafafa' : '#cbd5e1'}
               strokeWidth={3}
               dot={false}
               filter="url(#glow-line)"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            {/* subtle area under the line for visibility */}
+            <defs>
+              {/* placeholder; Recharts Area uses separate component but gradient defined here for potential use */}
+            </defs>
+            {/* draw a small marker for the latest point */}
+            {data.length > 0 && (
+              <Line
+                type="monotone"
+                dataKey="value"
+                strokeOpacity={0}
+                dot={{ stroke: '#fff', strokeWidth: 2, r: 3, fill: '#fff' }}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
