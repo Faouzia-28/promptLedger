@@ -18,3 +18,8 @@ venv/
 *.swo
 *~
 .vscode/
+.local-preview.mjs
+.local-preview.ps1
+frontend/public/local-preview.html
+scripts/setup-local-db.ps1
+scripts/start-local-demo.ps1
