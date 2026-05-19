@@ -129,11 +129,11 @@ export default function EvalsPage() {
           <p className="text-muted-foreground">Filter by unit, inspect run-level details, and export the current slice when you need to share results.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setSearch('')}>
-            <Shuffle className="mr-2 h-4 w-4" />Reset filters
+          <Button variant="outline" onClick={() => setSearch('')} className="soft-glow soft-glow-strong">
+            <Shuffle className="mr-2 h-4 w-4 glow-icon" />Reset filters
           </Button>
-          <Button onClick={exportCsv} disabled={filteredRuns.length === 0}>
-            <Download className="mr-2 h-4 w-4" />Export CSV
+          <Button onClick={exportCsv} disabled={filteredRuns.length === 0} className="soft-glow soft-glow-strong">
+            <Download className="mr-2 h-4 w-4 glow-icon" />Export CSV
           </Button>
         </div>
       </div>

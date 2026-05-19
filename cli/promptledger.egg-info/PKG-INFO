@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: promptledger
+Version: 0.1.0
+Summary: PromptLedger CLI and SDK
+Requires-Python: >=3.11
+Requires-Dist: click
+Requires-Dist: rich
+Requires-Dist: httpx
+Requires-Dist: pyyaml

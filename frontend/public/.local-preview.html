@@ -1,0 +1,19 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PromptLedger preview</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiM2I1MWE4MTgtMWZiOS00NGY5LWI3NzctZGRmMmFjNzM4NjUwIiwib3JnX2lkIjoiNWE2ZWJlNWYtMTYyNy00NTE1LTlkOWYtMTRkNWZkMzZhMzRhIiwiZXhwIjoxNzc5MjAzNzI2fQ.cmc_xMXJGvxPJZGdcq7Cl_Dgz5U5Y44CA-2TXwPRUOg';
+        const user = {"id":"3b51a818-1fb9-44f9-b777-ddf2ac738650","email":"demo_e2a1a97f@example.com","role":"admin","org_id":"5a6ebe5f-1627-4515-9d9f-14d5fd36a34a"};
+        localStorage.setItem('access_token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        window.location.replace('http://localhost:3000/overview');
+      })();
+    </script>
+  </body>
+</html>

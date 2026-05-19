@@ -226,8 +226,8 @@ export default function GitHubSyncPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">GitHub Sync</h1>
           <p className="mt-1 text-sm text-zinc-400">Connected repositories, PAT state, and manual sync controls are all visible here.</p>
         </div>
-        <Button onClick={openAddDialog} className="soft-glow inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
-          <Plus className="h-4 w-4" />
+        <Button onClick={openAddDialog} className="soft-glow soft-glow-strong inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 text-zinc-100 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] transition-all duration-200 ease-out hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
+          <Plus className="h-4 w-4 glow-icon" />
           Add repository
         </Button>
       </div>
@@ -305,11 +305,11 @@ export default function GitHubSyncPage() {
                       <RepoBadges hasToken={Boolean(integration.has_github_token)} enabled={Boolean(integration.enabled)} linkedName={integration.unit?.name || integration.unit_name} />
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button type="button" variant="outline" size="sm" onClick={() => openSyncDialog(integration)} className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
-                        <RefreshCw className="mr-2 h-4 w-4" />Manual sync
+                      <Button type="button" variant="outline" size="sm" onClick={() => openSyncDialog(integration)} className="soft-glow soft-glow-strong border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
+                        <RefreshCw className="mr-2 h-4 w-4 glow-icon" />Manual sync
                       </Button>
-                      <Button type="button" variant="outline" size="sm" onClick={() => openEditDialog(integration)} className="border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
-                        <PencilLine className="mr-2 h-4 w-4" />Edit
+                      <Button type="button" variant="outline" size="sm" onClick={() => openEditDialog(integration)} className="soft-glow soft-glow-strong border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-zinc-100 hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.08)] hover:text-zinc-100">
+                        <PencilLine className="mr-2 h-4 w-4 glow-icon" />Edit
                       </Button>
                     </div>
                   </div>

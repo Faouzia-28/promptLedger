@@ -1,0 +1,2 @@
+[console_scripts]
+promptledger = promptledger.cli:main

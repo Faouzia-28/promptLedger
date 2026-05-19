@@ -242,8 +242,8 @@ export default function EvalRunDetailPage() {
                 Regrade this run
               </Button>
               <div className="grid gap-2 sm:grid-cols-2">
-                <Button variant="outline" onClick={exportJson}><Download className="mr-2 h-4 w-4" />Export JSON</Button>
-                <Button variant="outline" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />Export CSV</Button>
+                <Button variant="outline" onClick={exportJson} className="soft-glow soft-glow-strong"><Download className="mr-2 h-4 w-4 glow-icon" />Export JSON</Button>
+                <Button variant="outline" onClick={exportCsv} className="soft-glow soft-glow-strong"><Download className="mr-2 h-4 w-4 glow-icon" />Export CSV</Button>
               </div>
             </div>
 
