@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     OLLAMA_FAST_MODEL: str = "phi3:mini"
     EVAL_LLM_TIMEOUT_SECONDS: int = 45
     EVAL_LLM_MAX_TOKENS: int = 512
+    EVAL_PASS_THRESHOLD: float = 0.5
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"

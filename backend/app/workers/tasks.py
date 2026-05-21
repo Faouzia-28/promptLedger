@@ -240,7 +240,7 @@ def run_regression_eval(eval_run_id: str):
 					'expected': case.get('expected_output', ''),
 					'actual': output,
 					'score': float(score),
-					'passed': float(score) >= 0.7,
+					'passed': float(score) >= settings.EVAL_PASS_THRESHOLD,
 					'score_raw': score_result,
 				})
 

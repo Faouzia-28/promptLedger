@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PromptLedger</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-soft: #141414;
+      --panel: #141414;
+      --panel-border: #1e1e1e;
+      --field: #1a1a1a;
+      --field-border: #2a2a2a;
+      --text: #e8e8e4;
+      --muted: #444;
+      --border: #2a2a2a;
+      --accent: #4ade80;
+      --cta: #ffffff;
+      --cta-text: #0a0a0a;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0) 0 0 / 22px 22px,
+        linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+      font-family: "DM Sans", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 32px;
+      padding: 28px;
+    }
+
+    .left,
+    .right {
+      min-height: calc(100vh - 56px);
+    }
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px 8px 18px 12px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      color: #fff;
+      font: 700 15px/1 "DM Mono", ui-monospace, SFMono-Regular, monospace;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-name {
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 11ch;
+      font-size: clamp(3.2rem, 8vw, 6.6rem);
+      line-height: 0.93;
+      letter-spacing: -0.07em;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .subheadline {
+      margin: 22px 0 0;
+      max-width: 54ch;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #9b9b9b;
+    }
+
+    .features {
+      display: grid;
+      gap: 14px;
+      margin: 34px 0 0;
+      max-width: 540px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 14px;
+      align-items: start;
+      color: #cfcfc8;
+    }
+
+    .feature svg {
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+      margin-top: 1px;
+      flex: 0 0 auto;
+    }
+
+    .feature strong {
+      display: block;
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .feature span {
+      color: #8d8d8d;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .proof {
+      margin-top: 34px;
+      color: #8c8c8c;
+      font-size: 14px;
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 520px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 22px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1f1f1f;
+    }
+
+    .tab {
+      position: relative;
+      padding: 0 0 14px;
+      border: 0;
+      background: transparent;
+      color: #767676;
+      font: inherit;
+      cursor: pointer;
+      transition: color 150ms ease, opacity 150ms ease;
+    }
+
+    .tab.active {
+      color: #fff;
+    }
+
+    .tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .form-shell {
+      position: relative;
+      min-height: 402px;
+    }
+
+    .form-view {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      gap: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .form-view.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .field-row {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-row.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #8f8f8f;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--field-border);
+      background: var(--field);
+      color: #d8d8d4;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 150ms ease, background-color 150ms ease;
+      font-family: "DM Sans", system-ui, sans-serif;
+    }
+
+    input::placeholder {
+      color: #444;
+    }
+
+    input:focus {
+      border-color: #3a3a3a;
+      box-shadow: none;
+    }
+
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: -4px;
+    }
+
+    .link {
+      color: #7f7f7f;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      color: #adadad;
+    }
+
+    .cta {
+      width: 100%;
+      margin-top: 6px;
+      border: 0;
+      background: var(--cta);
+      color: var(--cta-text);
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: filter 150ms ease, transform 150ms ease;
+    }
+
+    .cta:hover {
+      filter: brightness(95%);
+    }
+
+    .divider {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 14px;
+      color: #686868;
+      font-size: 12px;
+      margin: 6px 0 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      height: 1px;
+      background: #222;
+    }
+
+    .oauth {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      border: 1px solid #2a2a2a;
+      background: #121212;
+      color: #e2e2de;
+      border-radius: 10px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: filter 150ms ease, border-color 150ms ease;
+    }
+
+    .oauth:hover {
+      filter: brightness(95%);
+      border-color: #3a3a3a;
+    }
+
+    .legal {
+      margin-top: 14px;
+      color: #626262;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .icon {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .left,
+      .right {
+        min-height: auto;
+      }
+
+      .panel {
+        max-width: 100%;
+      }
+
+      h1 {
+        max-width: 12ch;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 18px;
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .field-row.two {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 15vw, 4.25rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="left">
+      <div>
+        <div class="brand">
+          <div class="mark">PL</div>
+          <div class="brand-name">PromptLedger</div>
+        </div>
+
+        <h1>Monitor every prompt. Ship with confidence.</h1>
+
+        <p class="subheadline">
+          Detect drift, compare versions, and keep your LLM behavior consistent across releases.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-4"/><path d="M12 16V8"/><path d="M16 16v-6"/></svg>
+            <div>
+              <strong>Version intelligence</strong>
+              <span>Compare prompt revisions and understand behavioral shifts before they ship.</span>
+            </div>
+          </div>
+          <div class="feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 10l7-7 7 7"/><path d="M5 14l7 7 7-7"/></svg>
+            <div>
+              <strong>Fast regression checks</strong>
+              <span>Run curated test suites and catch regressions in tone, refusal, and relevance.</span>
+            </div>
+          </div>
+          <div class="feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7 10 17l-5-5"/></svg>
+            <div>
+              <strong>Deployment-ready gates</strong>
+              <span>Use threshold-based scoring to approve changes with clear, auditable evidence.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="proof">Trusted by 2,000+ teams shipping AI features every week.</div>
+      </div>
+    </section>
+
+    <section class="right" aria-label="Authentication">
+      <div class="panel">
+        <div class="tabs" role="tablist" aria-label="Authentication mode">
+          <button class="tab active" id="tab-signin" type="button" data-target="signin" aria-selected="true">Sign in</button>
+          <button class="tab" id="tab-signup" type="button" data-target="signup" aria-selected="false">Sign up</button>
+        </div>
+
+        <div class="form-shell">
+          <form class="form-view active" id="signin-form">
+            <div>
+              <label for="signin-email">Email</label>
+              <input id="signin-email" type="email" placeholder="you@company.com" />
+            </div>
+            <div>
+              <label for="signin-password">Password</label>
+              <input id="signin-password" type="password" placeholder="••••••••" />
+            </div>
+            <div class="row-between">
+              <span></span>
+              <a class="link" href="#">Forgot password?</a>
+            </div>
+            <button class="cta" type="button">Sign in</button>
+            <div class="divider">or continue with</div>
+            <button class="oauth" type="button">
+              <span class="icon" aria-hidden="true">⌘</span>
+              GitHub
+            </button>
+          </form>
+
+          <form class="form-view" id="signup-form" aria-hidden="true">
+            <div class="field-row two">
+              <div>
+                <label for="signup-name">Full name</label>
+                <input id="signup-name" type="text" placeholder="Ada Lovelace" />
+              </div>
+              <div>
+                <label for="signup-email">Email</label>
+                <input id="signup-email" type="email" placeholder="you@company.com" />
+              </div>
+            </div>
+            <div>
+              <label for="signup-password">Password</label>
+              <input id="signup-password" type="password" placeholder="Create a secure password" />
+            </div>
+            <button class="cta" type="button">Create account</button>
+            <div class="divider">or continue with</div>
+            <button class="oauth" type="button">
+              <span class="icon" aria-hidden="true">⌘</span>
+              GitHub
+            </button>
+          </form>
+        </div>
+
+        <div class="legal">By continuing you agree to our Terms.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const views = {
+      signin: document.getElementById('signin-form'),
+      signup: document.getElementById('signup-form'),
+    };
+
+    function setActive(target) {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.target === target;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+      Object.entries(views).forEach(([name, view]) => {
+        const active = name === target;
+        view.classList.toggle('active', active);
+        view.setAttribute('aria-hidden', String(!active));
+      });
+    }
+
+    tabs.forEach((tab) => tab.addEventListener('click', () => setActive(tab.dataset.target)));
+  </script>
+</body>
+</html>

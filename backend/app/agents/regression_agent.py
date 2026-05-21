@@ -1,6 +1,7 @@
 """RegressionAgent - Runs evaluation sets and gates deployments."""
 import json
 from sqlalchemy import select
+from app.core.config import settings
 from app.agents.base import BaseAgent
 from app.models.models import EvalRun, EvalSet, BehaviorVersion, AuditLog
 from app.services.llm_service import llm
@@ -44,7 +45,7 @@ class RegressionAgent(BaseAgent):
                     'actual': output,
                     'score': score.get('overall', 0.5),
                     'breakdown': score,
-                    'passed': score.get('overall', 0.5) >= 0.7
+                    'passed': score.get('overall', 0.5) >= settings.EVAL_PASS_THRESHOLD
                 })
             except Exception as e:
                 results.append({
