@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     OLLAMA_MODEL: str = "llama3.1:8b"
     OLLAMA_FAST_MODEL: str = "phi3:mini"
     EVAL_LLM_TIMEOUT_SECONDS: int = 45
+    EVAL_LLM_MAX_TOKENS: int = 512
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"
@@ -41,7 +42,7 @@ class Settings(BaseSettings):
         'Input: {input}\n'
         'Criteria: {criteria}\n'
         'Response: {response}\n'
-        'Return ONLY valid JSON like: {"overall": 0.0}'
+        'Return ONLY valid JSON like: {{"overall": 0.0}}'
     )
 
 
