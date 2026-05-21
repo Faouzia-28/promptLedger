@@ -99,6 +99,12 @@ def run_regression_eval(eval_run_id: str):
 				if system_prompt:
 					messages.append({'role': 'system', 'content': system_prompt})
 				messages.append({'role': 'user', 'content': user_message})
+				# Ensure the raw case input is always included as a user message.
+				# Some version templates may contain only instructions and omit a {input}
+				# placeholder; in that case append the raw input so the model sees it.
+				raw_input = case.get('input', '') or ''
+				if raw_input and raw_input.strip() and raw_input not in user_message:
+					messages.append({'role': 'user', 'content': raw_input})
 				
 				# Call LLM
 				# Log messages sent to LLM for debugging
@@ -106,7 +112,7 @@ def run_regression_eval(eval_run_id: str):
 				output = _run_sync_llm(
 					messages,
 					temperature=0.1,
-					max_tokens=2000,
+					max_tokens=settings.EVAL_LLM_MAX_TOKENS,
 					timeout_seconds=llm_timeout,
 				)
 				print(f"[EVAL] Case {i} output: {output[:100]}")
@@ -118,10 +124,12 @@ def run_regression_eval(eval_run_id: str):
 				templates = get_templates()
 				user_template = templates.get('user_template') or settings.EVAL_SCORE_USER_TEMPLATE
 				system_prompt = templates.get('system_prompt') or settings.EVAL_SCORE_SYSTEM_PROMPT
-				user_content = user_template.format(
-					input=(case.get('input', '') or '')[:1000],
-					criteria=(criteria or '')[:500],
-					response=(output or '')[:2000],
+				# Avoid str.format so JSON braces in the template do not trigger KeyError.
+				user_content = (
+					user_template
+					.replace('{input}', (case.get('input', '') or '')[:1000])
+					.replace('{criteria}', (criteria or '')[:500])
+					.replace('{response}', (output or '')[:2000])
 				)
 				score_messages = [
 					{'role': 'system', 'content': system_prompt},
