@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/landing.html');
+    router.replace('/landing-connected.html');
   }, [router]);
 
   return (
