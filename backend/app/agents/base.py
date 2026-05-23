@@ -4,6 +4,7 @@ import numpy as np
 from typing import Optional
 from app.services.llm_service import llm
 from app.services.embed_service import embedder
+from app.core.config import settings
 
 
 class BaseAgent:
@@ -31,7 +32,12 @@ class BaseAgent:
         messages.append({'role': 'user', 'content': user_message})
         
         # Call LLM
-        result = await llm.chat(messages, temperature=0.1, max_tokens=2000)
+        result = await llm.chat(
+            messages,
+            temperature=0.1,
+            max_tokens=settings.EVAL_LLM_MAX_TOKENS,
+            provider=provider,
+        )
         return result
 
     async def _count_refusals(self, outputs: list[str]) -> int:

@@ -135,6 +135,9 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
     )
 
+    # Alembic's default version table uses a short varchar that cannot hold these revision IDs.
+    op.execute("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)")
+
 
 def downgrade() -> None:
     op.drop_table("production_samples")

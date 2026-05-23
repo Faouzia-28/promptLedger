@@ -1,0 +1,6 @@
+{
+  "name": "PromptLedger",
+  "description": "Git for AI Behavior. CI/CD for LLM Prompts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -55,6 +55,7 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/2
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       JWT_EXPIRATION_HOURS: 24
+      LLM_PROVIDER: grok
       AWS_REGION: ${AWS_REGION:-ap-southeast-1}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}

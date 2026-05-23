@@ -30,6 +30,7 @@ from app.schemas.schemas import (
     GitHubSyncResponse,
 )
 from app.workers.tasks import run_regression_eval
+from app.utils.prompt_validation import validate_prompt_content
 
 
 router = APIRouter(prefix="/github", tags=["github"])
@@ -418,6 +419,11 @@ async def _create_version_and_eval(
     version_result = await db.execute(version_stmt)
     latest_version = version_result.scalars().first()
     next_version = (latest_version.version_number if latest_version else 0) + 1
+
+    # Validate prompt content from GitHub; reject config-like payloads
+    invalid, msg = validate_prompt_content(content)
+    if invalid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"GitHub file rejected: {msg}")
 
     model_config_value = model_config if model_config is not None else (content.get("model_config") or {})
 

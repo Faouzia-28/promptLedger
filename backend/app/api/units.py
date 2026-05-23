@@ -11,6 +11,7 @@ from app.models.models import BehaviorUnit, BehaviorVersion, EvalSet, User
 from app.agents.compliance_agent import compliance_agent
 from app.agents.semantic_diff_agent import semantic_diff_agent
 from app.services.fingerprint_service import fingerprint_service
+from app.utils.prompt_validation import validate_prompt_content
 import uuid
 from datetime import datetime
 
@@ -189,6 +190,11 @@ async def create_version(
     unit = result.scalars().first()
     if not unit:
         raise HTTPException(status_code=404, detail="Unit not found")
+
+    # Validate prompt content: reject config-like prompt payloads
+    invalid, msg = validate_prompt_content(request.content)
+    if invalid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
     
     # Get next version number
     version_stmt = select(BehaviorVersion).where(

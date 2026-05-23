@@ -1,0 +1,20 @@
+# Commands to SCP, copy into container, run test, and tail logs.
+# Replace the username if not 'ubuntu'. Uses your key: C:\Users\FAOUZIA V\.ssh\promptledger_deploy
+
+# 1) SCP the test script to the host
+scp -i "C:\Users\FAOUZIA V\.ssh\promptledger_deploy" patches/groq_test.py ubuntu@47.130.139.29:/tmp/groq_test.py
+
+# 2) Copy the script into the running container and run it
+ssh -i "C:\Users\FAOUZIA V\.ssh\promptledger_deploy" ubuntu@47.130.139.29 "sudo docker cp /tmp/groq_test.py promptledger-api:/tmp/groq_test.py && sudo docker exec promptledger-api python3 /tmp/groq_test.py"
+
+# 3) Tail the API logs while you reproduce the UI error (open the UI test page and run the test):
+ssh -i "C:\Users\FAOUZIA V\.ssh\promptledger_deploy" ubuntu@47.130.139.29 "sudo docker logs -f promptledger-api"
+
+# 4) If you want to capture logs to a file on host for sharing:
+ssh -i "C:\Users\FAOUZIA V\.ssh\promptledger_deploy" ubuntu@47.130.139.29 "sudo docker logs promptledger-api --since 1m > /tmp/promptledger_recent_logs.txt && sudo chown $(id -u):$(id -g) /tmp/promptledger_recent_logs.txt"
+
+# 5) If Groq returns 401 in the test, rotate the GROQ_API_KEY in your backend environment and restart the container:
+# (How you update depends on how you deploy. If you use a simple env file inside the container image, update the image or docker run args.)
+sudo docker restart promptledger-api
+
+# Paste the outputs from the test and any relevant lines from the logs here for analysis.

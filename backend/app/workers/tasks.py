@@ -13,6 +13,7 @@ from app.services.llm_service import llm
 from app.core.observability import observe_scorer
 from app.utils.score_parser import parse_score_text, fallback_heuristic
 from app.core.template_store import get_templates
+from app.utils.prompt_validation import validate_prompt_content
 import asyncio
 from datetime import datetime, timezone
 
@@ -88,6 +89,21 @@ def run_regression_eval(eval_run_id: str):
 			try:
 				# Run version with input
 				content = version.content if isinstance(version.content, dict) else json.loads(version.content or '{}')
+
+				# Validate prompt content to avoid running model against config-like payloads
+				invalid, invalid_msg = validate_prompt_content(content)
+				if invalid:
+					# Mark run failed and return early
+					run.status = "failed"
+					run.results = [{
+						'case_index': None,
+						'error': 'prompt_validation_failed',
+						'message': invalid_msg
+					}]
+					run.score = 0.0
+					run.completed_at = datetime.now(timezone.utc)
+					db.commit()
+					return {"status": "failed", "score": 0.0, "error": invalid_msg}
 				system_prompt = content.get('system_prompt') or content.get('system_message', '')
 				user_template = content.get('prompt') or content.get('user_prompt', '{input}')
 				

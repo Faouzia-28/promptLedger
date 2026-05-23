@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Line, LineChart, ResponsiveContainer, Area, ReferenceDot } from 'recharts';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useBehaviorUnits, useDriftEvents, useGitHubIntegrations, useCurrentUser } from '@/lib/hooks';
@@ -158,49 +157,68 @@ function QuickActionPill({ href, icon: Icon, label }: { href: string; icon: Reac
 }
 
 function HealthSparkline({ points }: { points: number[] }) {
+  const chartId = useId();
   const trendUp = points.length > 1 ? points[points.length - 1] >= points[0] : true;
-  const data = points.map((value, index) => ({ index, value }));
+  const linePath = trendUp
+    ? 'M 16 122 C 150 122, 230 118, 324 104 S 516 58, 648 52'
+    : 'M 16 106 C 152 98, 232 92, 328 98 S 522 122, 648 136';
+  const areaPath = `${linePath} L 648 148 L 16 148 Z`;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.012))] p-4 shadow-[0_0_12px_rgba(255,255,255,0.04),0_1px_0_rgba(255,255,255,0.08)_inset,0_16px_36px_rgba(0,0,0,0.38)]">
+    <div className="relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.028),rgba(255,255,255,0.012))] p-4 shadow-[0_0_12px_rgba(255,255,255,0.04),0_1px_0_rgba(255,255,255,0.08)_inset,0_16px_36px_rgba(0,0,0,0.38)]">
       <div className="mb-3 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.1em] text-white/35">
         <span>Health trend</span>
         <span className={trendUp ? 'text-zinc-300' : 'text-zinc-400'}>{trendUp ? 'Trending up' : 'Trending down'}</span>
       </div>
-      <div className="h-[120px] w-full max-w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-            <defs>
-              <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.01" />
-              </linearGradient>
-              <filter id="glow-line">
-                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke={trendUp ? '#fafafa' : '#cbd5e1'}
-              strokeWidth={3}
-              dot={false}
-              filter="url(#glow-line)"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {/* subtle area under the line for visibility */}
-            <Area type="monotone" dataKey="value" stroke="none" fill="url(#area-gradient)" />
-            {/* draw a small marker for the latest point only */}
-            {data.length > 0 && (
-              <ReferenceDot x={data[data.length - 1].index} y={data[data.length - 1].value} r={3} fill="#fff" stroke="#fff" />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="relative h-[148px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[#080808]/90">
+        <div className="pointer-events-none absolute inset-0 z-20 select-none px-3 pt-4 text-[9px] font-mono text-neutral-600">
+          <div className="flex justify-between border-b border-neutral-900/40 pb-1">
+            <span>100% BEHAVIORAL FIDELITY</span>
+            <span>DEPLOYED MATCH</span>
+          </div>
+          <div className="flex justify-between border-b border-neutral-900/40 pb-1 pt-1.5">
+            <span>50% SPECIFICATIONS COMPLYING</span>
+            <span>DRIFT THRESHOLD LIMIT</span>
+          </div>
+          <div className="flex justify-between pt-1.5">
+            <span>0% CRITICAL FAILURES</span>
+            <span>BENCHMARK NOMINAL</span>
+          </div>
+        </div>
+
+        <svg viewBox="0 0 680 150" preserveAspectRatio="none" className="absolute inset-0 z-10 h-full w-full">
+          <defs>
+            <linearGradient id={`${chartId}-area`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.03" />
+            </linearGradient>
+            <filter id={`${chartId}-glow`} x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <path d={areaPath} fill={`url(#${chartId}-area)`} />
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter={`url(#${chartId}-glow)`}
+          />
+          <circle cx="648" cy={trendUp ? '52' : '136'} r="5" fill="#ffffff" opacity="0.2" className="animate-ping" />
+          <circle cx="648" cy={trendUp ? '52' : '136'} r="4" fill="#ffffff" />
+        </svg>
+
+        <div className="absolute bottom-2 left-3 z-30 flex items-center gap-1.5 rounded-md border border-neutral-800/85 bg-[#0e0e0e]/90 px-2.5 py-1 font-mono text-[10px] text-neutral-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+          <span>{trendUp ? 'TRENDING UP (HEALTHY)' : 'TRENDING DOWN (DRIFT DETECTED)'}</span>
+        </div>
       </div>
     </div>
   );

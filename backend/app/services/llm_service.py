@@ -8,8 +8,13 @@ from app.core.config import settings
 import httpx
 import json
 import asyncio
-from app.core.observability import SCORE_LATENCY, SCORE_CALLS
 import time
+
+try:
+    from app.core.observability import SCORE_LATENCY, SCORE_CALLS
+except Exception:
+    SCORE_LATENCY = None
+    SCORE_CALLS = None
 
 
 class LLMService:
@@ -22,10 +27,12 @@ class LLMService:
         self, 
         messages: list[dict], 
         temperature: float = 0.1, 
-        max_tokens: int = 2000
+        max_tokens: int = 2000,
+        provider: str | None = None,
     ) -> str:
         """Main chat endpoint. Routes to Ollama or Groq based on LLM_PROVIDER."""
-        if settings.LLM_PROVIDER == "ollama":
+        effective_provider = provider or settings.LLM_PROVIDER
+        if effective_provider == "ollama":
             return await self._ollama_chat(messages, temperature, max_tokens)
         else:
             return await self._groq_chat(messages, temperature, max_tokens)
@@ -81,11 +88,12 @@ class LLMService:
                         json=payload,
                     )
                     elapsed = time.time() - start
-                    try:
-                        SCORE_CALLS.inc()
-                        SCORE_LATENCY.observe(elapsed)
-                    except Exception:
-                        pass
+                    if SCORE_CALLS is not None and SCORE_LATENCY is not None:
+                        try:
+                            SCORE_CALLS.inc()
+                            SCORE_LATENCY.observe(elapsed)
+                        except Exception:
+                            pass
                     # Log raw response json for debugging
                     try:
                         data = response.json()
@@ -102,13 +110,25 @@ class LLMService:
                         print(f"[GROQ] 429 received, backing off {backoff}s (attempt {attempt})")
                         await asyncio.sleep(backoff)
                         continue
-                    raise RuntimeError(f"Groq error: {str(e)}")
+                    print(f"[GROQ] falling back to Ollama after HTTP {status}: {e}")
+                    break
                 except Exception as e:
-                    raise RuntimeError(f"Groq error: {str(e)}")
+                    print(f"[GROQ] falling back to Ollama after error: {e}")
+                    break
+
+        try:
+            return await self._ollama_chat(messages, temperature, max_tokens)
+        except Exception as fallback_error:
+            raise RuntimeError(f"Groq error: {fallback_error}")
 
     async def fast_chat(self, messages: list[dict]) -> str:
         """Use the smaller/faster model for quick classification tasks."""
-        if settings.LLM_PROVIDER == "ollama":
+        return await self.fast_chat_with_provider(messages)
+
+    async def fast_chat_with_provider(self, messages: list[dict], provider: str | None = None) -> str:
+        """Use the smaller/faster model for quick classification tasks."""
+        effective_provider = provider or settings.LLM_PROVIDER
+        if effective_provider == "ollama":
             async with httpx.AsyncClient(timeout=60.0) as client:
                 try:
                     response = await client.post(
@@ -140,7 +160,10 @@ class LLMService:
                     data = response.json()
                     return data.get("choices", [{}])[0].get("message", {}).get("content", "")
                 except Exception as e:
-                    raise RuntimeError(f"Groq fast chat error: {str(e)}")
+                    try:
+                        return await self._ollama_chat(messages, temperature=0.0, max_tokens=500)
+                    except Exception:
+                        raise RuntimeError(f"Groq fast chat error: {str(e)}")
 
 
 # Singleton instance

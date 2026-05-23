@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { 
   GitFork, 
   ChevronDown, 
@@ -38,6 +39,13 @@ export default function App() {
   const [authError, setAuthError] = useState<string>('');
   const [authSuccess, setAuthSuccess] = useState<string>('');
 
+  const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || '/api/v1',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
   // Trigger non-blocking user alert
   const triggerNotification = (msg: string) => {
     setNotificationMsg(msg);
@@ -68,31 +76,15 @@ export default function App() {
     setAuthSuccess('');
     setAuthLoading(true);
 
-    const endpoint = authMode === 'signin' ? '/api/v1/auth/login' : '/api/v1/auth/register';
-    const payload = authMode === 'signin'
-      ? { email: authEmail, password: authPassword }
-      : { org_name: authOrgName, email: authEmail, password: authPassword };
-
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const response = authMode === 'signin'
+        ? await api.post('/auth/login', { email: authEmail, password: authPassword })
+        : await api.post('/auth/register', { org_name: authOrgName, email: authEmail, password: authPassword });
 
-      const data = await response.json().catch(() => null);
+      const { access_token, user } = response.data;
 
-      if (!response.ok) {
-        throw new Error(data?.detail || data?.message || (authMode === 'signin' ? 'Login failed' : 'Registration failed'));
-      }
-
-      if (data?.access_token) {
-        localStorage.setItem('access_token', data.access_token);
-      }
-
-      if (data?.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
 
       setAuthSuccess(authMode === 'signin'
         ? 'Signed in successfully. Your session is active right here on the landing page.'
@@ -101,11 +93,16 @@ export default function App() {
       triggerNotification(authMode === 'signin'
         ? 'Signed in without leaving the landing page.'
         : 'Created your account without leaving the landing page.');
+
+      window.location.href = '/overview';
     } catch (error: any) {
-      const networkError = error.message?.includes('Failed to fetch')
-        ? 'Cannot reach the backend API at /api/v1. Start it and try again.'
-        : null;
-      setAuthError(networkError || error.message || 'Authentication failed');
+      const apiError = error.response?.data?.detail;
+      const networkError = error.message?.includes('Network Error')
+        ? 'Cannot reach backend API. Start backend on port 8000 and retry.'
+        : error.message?.includes('Failed to fetch')
+          ? 'Cannot reach backend API at /api/v1. Start it and try again.'
+          : null;
+      setAuthError(apiError || networkError || (authMode === 'signin' ? 'Login failed' : 'Registration failed'));
     } finally {
       setAuthLoading(false);
     }
