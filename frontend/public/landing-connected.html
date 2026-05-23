@@ -20,22 +20,118 @@
     </style>
   </head>
   <body>
-    <!-- Inline sign in / sign up form that posts to backend /auth endpoints -->
-    <div id="landing-auth" style="position:fixed;top:18px;right:18px;z-index:9999;font-family:var(--font-sans);">
-      <style>
-        #landing-auth .panel { background: rgba(0,0,0,0.7); color: #fff; padding: 14px; border-radius: 8px; width:320px; box-shadow:0 6px 24px rgba(0,0,0,0.5);} 
-        #landing-auth input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#fff}
-        #landing-auth button{width:100%;padding:8px;border-radius:6px;border:0;background:#0ea5a4;color:#021;} 
-        #landing-auth .switch{background:transparent;border:0;color:#ddd;text-decoration:underline;cursor:pointer;margin-top:8px}
-        #landing-auth .msg{font-size:13px;color:#f4dcdc;margin-top:8px}
-      </style>
-      <div class="panel" aria-hidden="false">
-        <div id="auth-title">Sign In</div>
-        <input id="auth-email" type="email" placeholder="Email" autocomplete="email" />
-        <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" />
-        <button id="auth-submit">Sign In</button>
-        <button class="switch" id="auth-toggle">Create account</button>
-        <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
+    <style>
+      #landing-auth-wrap {
+        width: min(100%, 1120px);
+        margin: 24px auto 0;
+        padding: 0 24px 32px;
+        box-sizing: border-box;
+      }
+      #landing-auth {
+        margin-left: auto;
+        width: min(100%, 380px);
+        font-family: var(--font-sans);
+      }
+      #landing-auth .panel {
+        background: rgba(10, 10, 10, 0.92);
+        color: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(12px);
+      }
+      #landing-auth .title {
+        font-size: 22px;
+        line-height: 1.2;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      #landing-auth .subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+      #landing-auth label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 10px 0 6px;
+      }
+      #landing-auth input {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        outline: none;
+        box-sizing: border-box;
+      }
+      #landing-auth input:focus {
+        border-color: rgba(32, 202, 196, 0.8);
+        box-shadow: 0 0 0 3px rgba(32, 202, 196, 0.12);
+      }
+      #landing-auth button.primary {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 0;
+        margin-top: 14px;
+        background: #20cac4;
+        color: #041010;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      #landing-auth button.switch {
+        width: 100%;
+        margin-top: 10px;
+        background: transparent;
+        border: 0;
+        color: rgba(255, 255, 255, 0.82);
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 8px 0;
+      }
+      #landing-auth .msg {
+        font-size: 13px;
+        color: #f4dcdc;
+        margin-top: 10px;
+        min-height: 18px;
+      }
+      #landing-auth .hint {
+        margin-top: 12px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.58);
+      }
+      #landing-auth .hidden { display: none; }
+      @media (max-width: 900px) {
+        #landing-auth-wrap { padding-left: 16px; padding-right: 16px; }
+        #landing-auth { margin: 0 auto; }
+      }
+    </style>
+
+    <div id="landing-auth-wrap">
+      <div id="landing-auth">
+        <div class="panel" aria-hidden="false">
+          <div id="auth-title" class="title">Sign In</div>
+          <div id="auth-subtitle" class="subtitle">Use the same backend as the /login page.</div>
+
+          <label id="org-label" class="hidden" for="auth-org">Organization Name</label>
+          <input id="auth-org" class="hidden" type="text" placeholder="Acme Corp" autocomplete="organization" />
+
+          <label for="auth-email">Email</label>
+          <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+          <label for="auth-password">Password</label>
+          <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+          <button id="auth-submit" class="primary">Sign In</button>
+          <button class="switch" id="auth-toggle" type="button">Create account</button>
+          <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
+          <div class="hint">Signing in stores the JWT in localStorage just like /login.</div>
+        </div>
       </div>
     </div>
 
@@ -43,43 +139,88 @@
 
     <script>
       (function(){
-        const base = '';
+        const base = '/api/v1';
         let isRegister = false;
+        const org = document.getElementById('auth-org');
+        const orgLabel = document.getElementById('org-label');
         const email = document.getElementById('auth-email');
         const pass = document.getElementById('auth-password');
         const submit = document.getElementById('auth-submit');
         const toggle = document.getElementById('auth-toggle');
         const title = document.getElementById('auth-title');
+        const subtitle = document.getElementById('auth-subtitle');
         const msg = document.getElementById('auth-msg');
 
-        function setLoading(v){ submit.disabled = v; toggle.disabled = v; }
+        function setLoading(v){
+          submit.disabled = v;
+          toggle.disabled = v;
+          org.disabled = v;
+          email.disabled = v;
+          pass.disabled = v;
+        }
+
+        function renderMode(){
+          title.textContent = isRegister ? 'Create account' : 'Sign In';
+          subtitle.textContent = isRegister ? 'Create your organization and user account.' : 'Use the same backend as the /login page.';
+          submit.textContent = isRegister ? 'Register' : 'Sign In';
+          toggle.textContent = isRegister ? 'Have an account? Sign in' : 'Create account';
+          org.classList.toggle('hidden', !isRegister);
+          orgLabel.classList.toggle('hidden', !isRegister);
+          msg.textContent = '';
+        }
 
         toggle.addEventListener('click', ()=>{
           isRegister = !isRegister;
-          title.textContent = isRegister ? 'Create account' : 'Sign In';
-          submit.textContent = isRegister ? 'Register' : 'Sign In';
-          toggle.textContent = isRegister ? 'Have an account? Sign in' : 'Create account';
-          msg.textContent = '';
+          renderMode();
         });
 
         submit.addEventListener('click', async ()=>{
-          const e = (email.value||'').trim();
-          const p = pass.value||'';
-          if(!e||!p){ msg.textContent = 'Provide email and password'; return; }
+          const e = (email.value || '').trim();
+          const p = pass.value || '';
+          const o = (org.value || '').trim();
+          if(!e || !p){ msg.textContent = 'Provide email and password'; return; }
+          if(isRegister && !o){ msg.textContent = 'Provide organization name'; return; }
+
           setLoading(true);
           try{
             const url = base + '/auth/' + (isRegister ? 'register' : 'login');
-            const body = isRegister ? {org_name: 'personal', email: e, password: p} : {email: e, password: p};
-            const res = await fetch(url, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-            const data = await res.json();
-            if(!res.ok){ msg.textContent = data.detail || JSON.stringify(data); setLoading(false); return; }
-            // store token and redirect to dashboard
-            if(data.access_token){ localStorage.setItem('promptledger_token', data.access_token); }
+            const body = isRegister ? { org_name: o, email: e, password: p } : { email: e, password: p };
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+
+            const text = await res.text();
+            let data = null;
+            try {
+              data = text ? JSON.parse(text) : null;
+            } catch {
+              data = { detail: text || 'Unexpected response from backend' };
+            }
+
+            if(!res.ok){
+              msg.textContent = (data && data.detail) ? data.detail : 'Authentication failed';
+              return;
+            }
+
+            if(data && data.access_token){
+              localStorage.setItem('access_token', data.access_token);
+            }
+            if(data && data.user){
+              localStorage.setItem('user', JSON.stringify(data.user));
+            }
+
             msg.textContent = 'Success — redirecting...';
             window.location.href = '/overview';
-          }catch(err){ msg.textContent = String(err); }
-          setLoading(false);
+          }catch(err){
+            msg.textContent = err && err.message ? err.message : String(err);
+          } finally {
+            setLoading(false);
+          }
         });
+
+        renderMode();
       })();
     </script>
   </body>
