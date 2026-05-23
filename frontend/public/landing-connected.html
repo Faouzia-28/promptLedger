@@ -249,19 +249,12 @@
           return true;
         };
 
-        if (moveAuthIntoLayout()) return;
+        const scheduleMove = () => {
+          if (moveAuthIntoLayout()) return;
+          requestAnimationFrame(scheduleMove);
+        };
 
-        const observer = new MutationObserver(() => {
-          if (moveAuthIntoLayout()) {
-            observer.disconnect();
-          }
-        });
-
-        observer.observe(root, { childList: true, subtree: true });
-        window.addEventListener('load', () => {
-          moveAuthIntoLayout();
-          observer.disconnect();
-        }, { once: true });
+        scheduleMove();
       })();
     </script>
   </body>
