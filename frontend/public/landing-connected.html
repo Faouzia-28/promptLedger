@@ -20,6 +20,67 @@
     </style>
   </head>
   <body>
+    <!-- Inline sign in / sign up form that posts to backend /auth endpoints -->
+    <div id="landing-auth" style="position:fixed;top:18px;right:18px;z-index:9999;font-family:var(--font-sans);">
+      <style>
+        #landing-auth .panel { background: rgba(0,0,0,0.7); color: #fff; padding: 14px; border-radius: 8px; width:320px; box-shadow:0 6px 24px rgba(0,0,0,0.5);} 
+        #landing-auth input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#fff}
+        #landing-auth button{width:100%;padding:8px;border-radius:6px;border:0;background:#0ea5a4;color:#021;} 
+        #landing-auth .switch{background:transparent;border:0;color:#ddd;text-decoration:underline;cursor:pointer;margin-top:8px}
+        #landing-auth .msg{font-size:13px;color:#f4dcdc;margin-top:8px}
+      </style>
+      <div class="panel" aria-hidden="false">
+        <div id="auth-title">Sign In</div>
+        <input id="auth-email" type="email" placeholder="Email" autocomplete="email" />
+        <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" />
+        <button id="auth-submit">Sign In</button>
+        <button class="switch" id="auth-toggle">Create account</button>
+        <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+      (function(){
+        const base = '';
+        let isRegister = false;
+        const email = document.getElementById('auth-email');
+        const pass = document.getElementById('auth-password');
+        const submit = document.getElementById('auth-submit');
+        const toggle = document.getElementById('auth-toggle');
+        const title = document.getElementById('auth-title');
+        const msg = document.getElementById('auth-msg');
+
+        function setLoading(v){ submit.disabled = v; toggle.disabled = v; }
+
+        toggle.addEventListener('click', ()=>{
+          isRegister = !isRegister;
+          title.textContent = isRegister ? 'Create account' : 'Sign In';
+          submit.textContent = isRegister ? 'Register' : 'Sign In';
+          toggle.textContent = isRegister ? 'Have an account? Sign in' : 'Create account';
+          msg.textContent = '';
+        });
+
+        submit.addEventListener('click', async ()=>{
+          const e = (email.value||'').trim();
+          const p = pass.value||'';
+          if(!e||!p){ msg.textContent = 'Provide email and password'; return; }
+          setLoading(true);
+          try{
+            const url = base + '/auth/' + (isRegister ? 'register' : 'login');
+            const body = isRegister ? {org_name: 'personal', email: e, password: p} : {email: e, password: p};
+            const res = await fetch(url, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const data = await res.json();
+            if(!res.ok){ msg.textContent = data.detail || JSON.stringify(data); setLoading(false); return; }
+            // store token and redirect to dashboard
+            if(data.access_token){ localStorage.setItem('promptledger_token', data.access_token); }
+            msg.textContent = 'Success — redirecting...';
+            window.location.href = '/overview';
+          }catch(err){ msg.textContent = String(err); }
+          setLoading(false);
+        });
+      })();
+    </script>
   </body>
 </html>
