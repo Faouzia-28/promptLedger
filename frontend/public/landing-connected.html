@@ -22,147 +22,67 @@
   <body>
     <style>
       #landing-auth-wrap {
-        width: min(100%, 1180px);
-        margin: 64px auto 0;
-        padding: 0 24px 40px;
+        width: 100%;
+        margin: 0;
+        padding: 96px 24px 120px;
+        background: #000;
         box-sizing: border-box;
       }
       #landing-auth {
-        width: 100%;
+        width: min(100%, 400px);
+        margin: 0 auto;
         font-family: var(--font-sans);
       }
-      #landing-auth .panel {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 380px);
-        gap: 28px;
-        align-items: stretch;
-        background: linear-gradient(180deg, rgba(16, 16, 16, 0.96), rgba(8, 8, 8, 0.92));
-        color: #fff;
-        padding: 28px;
-        border-radius: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(12px);
-      }
-      #landing-auth .panel-copy {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 14px;
-        min-height: 100%;
-        padding: 6px 10px 6px 6px;
-      }
-      #landing-auth .eyebrow {
-        display: inline-flex;
-        width: fit-content;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(32, 202, 196, 0.24);
-        background: rgba(32, 202, 196, 0.08);
-        color: #8ef1ec;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-      #landing-auth .panel-copy h2 {
-        margin: 0;
-        font-size: clamp(28px, 4vw, 46px);
-        line-height: 0.95;
-        letter-spacing: -0.04em;
-      }
-      #landing-auth .panel-copy p {
-        margin: 0;
-        max-width: 52ch;
-        color: rgba(255, 255, 255, 0.72);
-        font-size: 15px;
-        line-height: 1.6;
-      }
-      #landing-auth .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 8px;
-      }
-      #landing-auth .feature {
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(255, 255, 255, 0.03);
-        padding: 14px;
-      }
-      #landing-auth .feature strong {
-        display: block;
-        font-size: 14px;
-        margin-bottom: 4px;
-      }
-      #landing-auth .feature span {
-        display: block;
-        font-size: 12px;
-        line-height: 1.5;
-        color: rgba(255, 255, 255, 0.68);
-      }
-      #landing-auth .panel-form {
-        border-radius: 22px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(0, 0, 0, 0.26);
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
       #landing-auth .title {
-        font-size: 22px;
+        font-size: 30px;
         line-height: 1.2;
         font-weight: 700;
-        margin-bottom: 4px;
-      }
-      #landing-auth .subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 13px;
-        margin-bottom: 14px;
+        margin: 0 0 18px;
+        color: #fff;
+        letter-spacing: -0.04em;
       }
       #landing-auth label {
         display: block;
         font-size: 12px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.8);
-        margin: 10px 0 6px;
+        color: rgba(255, 255, 255, 0.82);
+        margin: 14px 0 6px;
       }
       #landing-auth input {
         width: 100%;
-        padding: 11px 12px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.04);
+        margin-top: 10px;
+        padding: 14px 14px;
+        border-radius: 12px;
+        border: 1px solid #232323;
+        background: #1a1a1a;
         color: #fff;
         outline: none;
         box-sizing: border-box;
       }
       #landing-auth input:focus {
-        border-color: rgba(32, 202, 196, 0.8);
-        box-shadow: 0 0 0 3px rgba(32, 202, 196, 0.12);
+        border-color: #00d4c8;
+        box-shadow: 0 0 0 3px rgba(0, 212, 200, 0.16);
       }
       #landing-auth button.primary {
         width: 100%;
-        padding: 12px 14px;
-        border-radius: 10px;
+        padding: 13px 14px;
+        border-radius: 12px;
         border: 0;
-        margin-top: 14px;
-        background: #20cac4;
+        margin-top: 16px;
+        background: #00d4c8;
         color: #041010;
         font-weight: 700;
         cursor: pointer;
       }
       #landing-auth button.switch {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 12px;
         background: transparent;
         border: 0;
-        color: rgba(255, 255, 255, 0.82);
+        color: #9e9e9e;
         text-decoration: underline;
         cursor: pointer;
-        padding: 8px 0;
+        padding: 8px 0 0;
       }
       #landing-auth .msg {
         font-size: 13px;
@@ -170,92 +90,33 @@
         margin-top: 10px;
         min-height: 18px;
       }
-      #landing-auth .hint {
-        margin-top: 12px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.58);
-      }
-      #landing-auth .badge-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 14px;
-      }
-      #landing-auth .badge {
-        font-size: 11px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 999px;
-        padding: 6px 10px;
-      }
       #landing-auth .hidden { display: none; }
       @media (max-width: 900px) {
-        #landing-auth-wrap { padding-left: 16px; padding-right: 16px; }
-        #landing-auth .panel { grid-template-columns: 1fr; padding: 18px; border-radius: 22px; }
-        #landing-auth .panel-copy { padding: 4px 2px 10px; }
-        #landing-auth .feature-grid { grid-template-columns: 1fr; }
+        #landing-auth-wrap { padding: 72px 16px 96px; }
+        #landing-auth { max-width: 100%; }
       }
     </style>
 
+    <div id="root"></div>
+
     <div id="landing-auth-wrap">
       <div id="landing-auth">
-        <div class="panel" aria-hidden="false">
-          <div class="panel-copy">
-            <div class="eyebrow">PromptLedger access</div>
-            <h2>One landing page. One auth flow. Same backend.</h2>
-            <p>
-              Sign in or create an organization account without leaving the landing page. The form uses the same auth backend as the standalone login route and stores the JWT locally so you land on the dashboard.
-            </p>
-            <div class="feature-grid">
-              <div class="feature">
-                <strong>Same backend</strong>
-                <span>Posts to the shared auth API used by /login.</span>
-              </div>
-              <div class="feature">
-                <strong>Overview redirect</strong>
-                <span>After auth, the flow sends you to /overview.</span>
-              </div>
-              <div class="feature">
-                <strong>JWT stored locally</strong>
-                <span>Session state goes into localStorage just like the app login.</span>
-              </div>
-              <div class="feature">
-                <strong>Org signup</strong>
-                <span>Create an account inline without leaving the landing page.</span>
-              </div>
-            </div>
-          </div>
+        <div id="auth-title" class="title">Sign In</div>
 
-          <div class="panel-form">
-            <div class="badge-row">
-              <div class="badge">Same backend as /login</div>
-              <div class="badge">JWT stored locally</div>
-            </div>
-            <div id="auth-title" class="title">Sign In</div>
-            <div id="auth-subtitle" class="subtitle">Use the same backend as the /login page.</div>
+        <label id="org-label" class="hidden" for="auth-org">Organization Name</label>
+        <input id="auth-org" class="hidden" type="text" placeholder="Acme Corp" autocomplete="organization" />
 
-            <label id="org-label" class="hidden" for="auth-org">Organization Name</label>
-            <input id="auth-org" class="hidden" type="text" placeholder="Acme Corp" autocomplete="organization" />
+        <label for="auth-email">Email</label>
+        <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
 
-            <label for="auth-email">Email</label>
-            <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
+        <label for="auth-password">Password</label>
+        <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
 
-            <label for="auth-password">Password</label>
-            <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
-
-            <button id="auth-submit" class="primary">Sign In</button>
-            <button class="switch" id="auth-toggle" type="button">Create account</button>
-            <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
-            <div class="hint">Signing in stores the JWT in localStorage just like /login.</div>
-          </div>
-        </div>
+        <button id="auth-submit" class="primary">Sign In</button>
+        <button class="switch" id="auth-toggle" type="button">Create account</button>
+        <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
       </div>
     </div>
-
-    <div id="root"></div>
 
     <script>
       (function(){
@@ -268,7 +129,6 @@
         const submit = document.getElementById('auth-submit');
         const toggle = document.getElementById('auth-toggle');
         const title = document.getElementById('auth-title');
-        const subtitle = document.getElementById('auth-subtitle');
         const msg = document.getElementById('auth-msg');
 
         function setLoading(v){
@@ -281,7 +141,6 @@
 
         function renderMode(){
           title.textContent = isRegister ? 'Create account' : 'Sign In';
-          subtitle.textContent = isRegister ? 'Create your organization and user account.' : 'Use the same backend as the /login page.';
           submit.textContent = isRegister ? 'Register' : 'Sign In';
           toggle.textContent = isRegister ? 'Have an account? Sign in' : 'Create account';
           org.classList.toggle('hidden', !isRegister);
@@ -349,7 +208,6 @@
               localStorage.setItem('user', JSON.stringify(data.user));
             }
 
-            msg.textContent = 'Success — redirecting...';
             setTimeout(() => {
               window.location.assign('/overview');
             }, 50);
