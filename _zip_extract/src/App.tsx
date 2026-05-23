@@ -177,137 +177,6 @@ export default function App() {
             </button>
           </div>
 
-          <motion.section
-            id="auth-panel"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.05 }}
-            className="w-full max-w-5xl mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr] items-stretch"
-          >
-            <div className="rounded-3xl border border-neutral-850 bg-[#070707]/90 p-6 sm:p-8 text-left space-y-4 shadow-2xl shadow-black/30 backdrop-blur-md">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-mono uppercase tracking-widest text-emerald-300">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Inline auth flow</span>
-              </div>
-              <div className="space-y-2">
-                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                  Sign in or create an account without leaving the landing page.
-                </h2>
-                <p className="text-sm text-neutral-400 leading-relaxed max-w-xl">
-                  Keep the first interaction on-brand. The form below submits directly from the landing experience and stores your session locally when the backend responds.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3 text-xs font-mono text-neutral-400">
-                <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
-                  <div className="text-white font-semibold mb-1">No redirect</div>
-                  <p>Auth happens inside the page.</p>
-                </div>
-                <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
-                  <div className="text-white font-semibold mb-1">Session ready</div>
-                  <p>Tokens are saved when returned.</p>
-                </div>
-                <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
-                  <div className="text-white font-semibold mb-1">Switch modes</div>
-                  <p>Use one card for both flows.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-neutral-850 bg-[#0a0a0a]/95 p-6 sm:p-8 shadow-2xl shadow-black/30 backdrop-blur-md">
-              <div className="flex items-center justify-between gap-3 mb-6">
-                <div>
-                  <div className="text-[10px] font-mono tracking-widest text-neutral-500 uppercase">Workspace access</div>
-                  <div className="mt-1 text-lg font-semibold text-white">{authMode === 'signin' ? 'Welcome back' : 'Create your workspace'}</div>
-                </div>
-                <div className="inline-flex rounded-full border border-neutral-800 bg-black/40 p-1 text-[10px] font-mono">
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('signin'); setAuthError(''); setAuthSuccess(''); }}
-                    className={`rounded-full px-3 py-1 transition ${authMode === 'signin' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'}`}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('signup'); setAuthError(''); setAuthSuccess(''); }}
-                    className={`rounded-full px-3 py-1 transition ${authMode === 'signup' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'}`}
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={submitAuth} className="space-y-4">
-                {authError && (
-                  <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                    {authError}
-                  </div>
-                )}
-
-                {authSuccess && (
-                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
-                    {authSuccess}
-                  </div>
-                )}
-
-                {authMode === 'signup' && (
-                  <label className="block space-y-2 text-sm">
-                    <span className="text-neutral-300 font-medium">Organization Name</span>
-                    <input
-                      type="text"
-                      value={authOrgName}
-                      onChange={(e) => setAuthOrgName(e.target.value)}
-                      placeholder="Acme Labs"
-                      disabled={authLoading}
-                      required
-                      className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
-                    />
-                  </label>
-                )}
-
-                <label className="block space-y-2 text-sm">
-                  <span className="text-neutral-300 font-medium">Email</span>
-                  <input
-                    type="email"
-                    value={authEmail}
-                    onChange={(e) => setAuthEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    disabled={authLoading}
-                    required
-                    className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
-                  />
-                </label>
-
-                <label className="block space-y-2 text-sm">
-                  <span className="text-neutral-300 font-medium">Password</span>
-                  <input
-                    type="password"
-                    value={authPassword}
-                    onChange={(e) => setAuthPassword(e.target.value)}
-                    placeholder="••••••••"
-                    disabled={authLoading}
-                    required
-                    className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
-                  />
-                </label>
-
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {authLoading ? (authMode === 'signin' ? 'Signing in...' : 'Creating account...') : (authMode === 'signin' ? 'Sign In' : 'Create Account')}
-                </button>
-
-                <p className="text-center text-xs text-neutral-500">
-                  {authMode === 'signin'
-                    ? 'Signing in keeps you on this landing page and stores the session locally.'
-                    : 'Signing up keeps you on this landing page and stores the session locally.'}
-                </p>
-              </form>
-            </div>
-          </motion.section>
-
           {/* Metrics Quick Strip */}
           <div className="pt-6 grid grid-cols-3 gap-6 sm:gap-12 border-t border-neutral-900/80 w-full max-w-lg text-center font-mono">
             <div className="space-y-0.5">
@@ -401,6 +270,137 @@ export default function App() {
           </div>
 
         </section>
+
+        <motion.section
+          id="auth-panel"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.05 }}
+          className="w-full max-w-5xl mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr] items-stretch"
+        >
+          <div className="rounded-3xl border border-neutral-850 bg-[#070707]/90 p-6 sm:p-8 text-left space-y-4 shadow-2xl shadow-black/30 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-mono uppercase tracking-widest text-emerald-300">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Inline auth flow</span>
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                Sign in or create an account without leaving the landing page.
+              </h2>
+              <p className="text-sm text-neutral-400 leading-relaxed max-w-xl">
+                Keep the first interaction on-brand. The form below submits directly from the landing experience and stores your session locally when the backend responds.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3 text-xs font-mono text-neutral-400">
+              <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
+                <div className="text-white font-semibold mb-1">No redirect</div>
+                <p>Auth happens inside the page.</p>
+              </div>
+              <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
+                <div className="text-white font-semibold mb-1">Session ready</div>
+                <p>Tokens are saved when returned.</p>
+              </div>
+              <div className="rounded-2xl border border-neutral-900 bg-black/40 p-3">
+                <div className="text-white font-semibold mb-1">Switch modes</div>
+                <p>Use one card for both flows.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-850 bg-[#0a0a0a]/95 p-6 sm:p-8 shadow-2xl shadow-black/30 backdrop-blur-md">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <div>
+                <div className="text-[10px] font-mono tracking-widest text-neutral-500 uppercase">Workspace access</div>
+                <div className="mt-1 text-lg font-semibold text-white">{authMode === 'signin' ? 'Welcome back' : 'Create your workspace'}</div>
+              </div>
+              <div className="inline-flex rounded-full border border-neutral-800 bg-black/40 p-1 text-[10px] font-mono">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('signin'); setAuthError(''); setAuthSuccess(''); }}
+                  className={`rounded-full px-3 py-1 transition ${authMode === 'signin' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'}`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('signup'); setAuthError(''); setAuthSuccess(''); }}
+                  className={`rounded-full px-3 py-1 transition ${authMode === 'signup' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'}`}
+                >
+                  Sign Up
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={submitAuth} className="space-y-4">
+              {authError && (
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                  {authError}
+                </div>
+              )}
+
+              {authSuccess && (
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+                  {authSuccess}
+                </div>
+              )}
+
+              {authMode === 'signup' && (
+                <label className="block space-y-2 text-sm">
+                  <span className="text-neutral-300 font-medium">Organization Name</span>
+                  <input
+                    type="text"
+                    value={authOrgName}
+                    onChange={(e) => setAuthOrgName(e.target.value)}
+                    placeholder="Acme Labs"
+                    disabled={authLoading}
+                    required
+                    className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
+                  />
+                </label>
+              )}
+
+              <label className="block space-y-2 text-sm">
+                <span className="text-neutral-300 font-medium">Email</span>
+                <input
+                  type="email"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  disabled={authLoading}
+                  required
+                  className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
+                />
+              </label>
+
+              <label className="block space-y-2 text-sm">
+                <span className="text-neutral-300 font-medium">Password</span>
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="••••••••"
+                  disabled={authLoading}
+                  required
+                  className="w-full rounded-2xl border border-neutral-800 bg-black/50 px-4 py-3 text-white placeholder:text-neutral-600 outline-none transition focus:border-neutral-700"
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {authLoading ? (authMode === 'signin' ? 'Signing in...' : 'Creating account...') : (authMode === 'signin' ? 'Sign In' : 'Create Account')}
+              </button>
+
+              <p className="text-center text-xs text-neutral-500">
+                {authMode === 'signin'
+                  ? 'Signing in keeps you on this landing page and stores the session locally.'
+                  : 'Signing up keeps you on this landing page and stores the session locally.'}
+              </p>
+            </form>
+          </div>
+        </motion.section>
 
       </main>
 

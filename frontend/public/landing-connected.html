@@ -233,5 +233,36 @@
         }, true);
       })();
     </script>
+
+    <script>
+      (function () {
+        const root = document.getElementById('root');
+        const authWrap = document.getElementById('landing-auth-wrap');
+        if (!root || !authWrap) return;
+
+        const moveAuthIntoLayout = () => {
+          const footer = root.querySelector('footer');
+          if (!footer) return false;
+          if (authWrap.parentElement !== root || authWrap.nextElementSibling !== footer) {
+            root.insertBefore(authWrap, footer);
+          }
+          return true;
+        };
+
+        if (moveAuthIntoLayout()) return;
+
+        const observer = new MutationObserver(() => {
+          if (moveAuthIntoLayout()) {
+            observer.disconnect();
+          }
+        });
+
+        observer.observe(root, { childList: true, subtree: true });
+        window.addEventListener('load', () => {
+          moveAuthIntoLayout();
+          observer.disconnect();
+        }, { once: true });
+      })();
+    </script>
   </body>
 </html>
