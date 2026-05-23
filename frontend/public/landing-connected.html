@@ -105,6 +105,22 @@
         font-size: 12px;
         color: rgba(255, 255, 255, 0.58);
       }
+      #landing-auth .badge-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      #landing-auth .badge {
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 999px;
+        padding: 6px 10px;
+      }
       #landing-auth .hidden { display: none; }
       @media (max-width: 900px) {
         #landing-auth-wrap { padding-left: 16px; padding-right: 16px; }
@@ -115,6 +131,10 @@
     <div id="landing-auth-wrap">
       <div id="landing-auth">
         <div class="panel" aria-hidden="false">
+          <div class="badge-row">
+            <div class="badge">Same backend as /login</div>
+            <div class="badge">JWT stored locally</div>
+          </div>
           <div id="auth-title" class="title">Sign In</div>
           <div id="auth-subtitle" class="subtitle">Use the same backend as the /login page.</div>
 
@@ -241,6 +261,18 @@
         });
 
         renderMode();
+
+        document.addEventListener('click', (event) => {
+          const target = event.target instanceof Element ? event.target.closest('button, a') : null;
+          if (!target) return;
+
+          const label = (target.textContent || '').trim();
+          if (label !== 'Get Started Free') return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          document.getElementById('landing-auth')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, true);
       })();
     </script>
   </body>

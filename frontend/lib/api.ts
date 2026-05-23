@@ -38,6 +38,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      const requestUrl = String(error.config?.url || '');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+      const isAuthCheck = requestUrl.includes('/auth/me');
+
+      if (!isAuthCheck && token) {
+        return Promise.reject(error);
+      }
+
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       if (typeof window !== 'undefined') {

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prestart": "sh -c 'if [ ! -f .next/BUILD_ID ]; then npm ci && npm run build; fi'",
+    "prestart": "sh -c 'if [ ! -d node_modules ] || [ ! -f .next/BUILD_ID ]; then npm ci && npm run build; fi'",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
