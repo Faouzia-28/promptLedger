@@ -139,7 +139,7 @@
 
     <script>
       (function(){
-        const base = '/api/v1';
+        const base = '';
         let isRegister = false;
         const org = document.getElementById('auth-org');
         const orgLabel = document.getElementById('org-label');
@@ -183,24 +183,42 @@
 
           setLoading(true);
           try{
-            const url = base + '/auth/' + (isRegister ? 'register' : 'login');
             const body = isRegister ? { org_name: o, email: e, password: p } : { email: e, password: p };
-            const res = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(body),
-            });
+            const paths = isRegister
+              ? ['/register', '/api/v1/auth/register']
+              : ['/login', '/api/v1/auth/login'];
 
-            const text = await res.text();
+            let res = null;
             let data = null;
-            try {
-              data = text ? JSON.parse(text) : null;
-            } catch {
-              data = { detail: text || 'Unexpected response from backend' };
+            let lastError = null;
+
+            for (const path of paths) {
+              try {
+                res = await fetch(path, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(body),
+                });
+
+                const text = await res.text();
+                try {
+                  data = text ? JSON.parse(text) : null;
+                } catch {
+                  data = { detail: text || 'Unexpected response from backend' };
+                }
+
+                if (res.ok && data && data.access_token) {
+                  break;
+                }
+
+                lastError = (data && (data.detail || data.message)) || 'Authentication failed';
+              } catch (error) {
+                lastError = error && error.message ? error.message : String(error);
+              }
             }
 
-            if(!res.ok){
-              msg.textContent = (data && data.detail) ? data.detail : 'Authentication failed';
+            if (!res || !res.ok || !data || !data.access_token) {
+              msg.textContent = lastError || 'Authentication failed';
               return;
             }
 
@@ -212,7 +230,9 @@
             }
 
             msg.textContent = 'Success — redirecting...';
-            window.location.href = '/overview';
+            setTimeout(() => {
+              window.location.assign('/overview');
+            }, 50);
           }catch(err){
             msg.textContent = err && err.message ? err.message : String(err);
           } finally {
