@@ -1,5 +1,6 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import { useDriftEvent } from '@/lib/hooks';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,10 +16,12 @@ const trendData = [
   { time: '14:00', score: 0.19 },
 ];
 
-export default function DriftDetailPage({ params }: { params: { id: string } }) {
-  const { data: event, isLoading } = useDriftEvent(params.id);
+export default function DriftDetailPage() {
+  const params = useParams<{ id: string }>();
+  const eventId = params?.id;
+  const { data: event, isLoading } = useDriftEvent(eventId);
 
-  if (isLoading) {
+  if (!eventId || isLoading) {
     return <Skeleton className="w-full h-96" />;
   }
 

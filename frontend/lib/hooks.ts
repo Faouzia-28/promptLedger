@@ -32,7 +32,21 @@ export function useBehaviorVersions(unitId: string) {
 }
 
 export function useDriftEvents(filters?: { severity?: string; unit_id?: string; resolved?: boolean }) {
-  const query = new URLSearchParams(filters as any).toString();
+  const queryParams = new URLSearchParams();
+
+  if (filters?.severity) {
+    queryParams.set('severity', filters.severity);
+  }
+
+  if (filters?.unit_id) {
+    queryParams.set('unit_id', filters.unit_id);
+  }
+
+  if (typeof filters?.resolved === 'boolean') {
+    queryParams.set('resolved', String(filters.resolved));
+  }
+
+  const query = queryParams.toString();
   return useSWR(`/drift/events?${query}`, fetcher, swrConfig);
 }
 

@@ -62,6 +62,21 @@ class DriftEventResponse(BaseModel):
     created_at: datetime
 
 
+def serialize_drift_event(event: DriftEvent) -> dict:
+    """Convert a drift event ORM row into a JSON-safe response payload."""
+    return {
+        "id": str(event.id),
+        "unit_id": str(event.unit_id),
+        "version_id": str(event.version_id) if event.version_id else None,
+        "severity": event.severity,
+        "drift_score": event.drift_score,
+        "details": event.details,
+        "root_cause": event.root_cause,
+        "resolved": event.resolved,
+        "created_at": event.created_at,
+    }
+
+
 @router.get("/events", response_model=List[DriftEventResponse])
 async def list_drift_events(
     unit_id: Optional[str] = None,
@@ -93,7 +108,7 @@ async def list_drift_events(
     
     stmt = stmt.order_by(desc(DriftEvent.created_at))
     result = await db.execute(stmt)
-    return result.scalars().all()
+    return [serialize_drift_event(event) for event in result.scalars().all()]
 
 
 @router.get("/events/{event_id}", response_model=DriftEventResponse)
@@ -116,7 +131,7 @@ async def get_drift_event(
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    return event
+    return serialize_drift_event(event)
 
 
 @router.post("/events/{event_id}/resolve")
