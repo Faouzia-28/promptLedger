@@ -24,25 +24,184 @@
       #landing-auth-wrap {
         width: 100%;
         margin: 0;
-        padding: 96px 24px 120px;
+        padding: 80px 60px;
         background: #000;
         box-sizing: border-box;
       }
+
       #landing-auth {
-        width: min(100%, 400px);
+        width: 100%;
         margin: 0 auto;
         font-family: var(--font-sans);
+        box-sizing: border-box;
       }
-      #landing-auth .title {
-        font-size: 30px;
-        line-height: 1.2;
-        font-weight: 700;
-        margin: 0 0 18px;
+
+      #landing-auth .auth-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 24px;
+        align-items: stretch;
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+
+      #landing-auth .auth-card {
+        background: #111111;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 16px;
+        padding: 32px;
+        box-sizing: border-box;
+        min-height: 100%;
+      }
+
+      #landing-auth .auth-card-left {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 28px;
+      }
+
+      #landing-auth .auth-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        align-self: flex-start;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0, 212, 200, 0.08);
+        border: 1px solid rgba(0, 212, 200, 0.2);
+        color: #00d4c8;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      #landing-auth .auth-badge svg {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
+        fill: currentColor;
+      }
+
+      #landing-auth .auth-left-heading {
+        margin: 18px 0 14px;
         color: #fff;
+        font-size: 34px;
+        line-height: 1.04;
         letter-spacing: -0.04em;
+        font-weight: 900;
+        max-width: 14ch;
       }
+
+      #landing-auth .auth-left-copy {
+        margin: 0;
+        color: #8a8a8a;
+        font-size: 16px;
+        line-height: 1.65;
+        max-width: 52ch;
+      }
+
+      #landing-auth .auth-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      #landing-auth .stat-item {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 14px;
+      }
+
+      #landing-auth .stat-label {
+        color: #fff;
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+
+      #landing-auth .stat-desc {
+        color: #8a8a8a;
+        font-size: 12px;
+        line-height: 1.55;
+        font-family: var(--font-mono);
+      }
+
+      #landing-auth .auth-card-right {
+        display: flex;
+        flex-direction: column;
+      }
+
+      #landing-auth .auth-card-head {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      #landing-auth .section-label {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: #9e9e9e;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-align: center;
+        margin: 0 0 10px;
+      }
+
+      #landing-auth .title {
+        font-size: 32px;
+        line-height: 1.05;
+        font-weight: 900;
+        margin: 0;
+        color: #ffffff;
+        text-align: center;
+        letter-spacing: -0.03em;
+      }
+
+      #landing-auth .auth-tabs {
+        display: inline-flex;
+        gap: 6px;
+        padding: 4px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        flex: 0 0 auto;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+
+      #landing-auth .auth-tab {
+        border: 0;
+        background: transparent;
+        color: #9a9a9a;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      #landing-auth .auth-tab.active {
+        background: #fff;
+        color: #111;
+      }
+
+      #landing-auth .auth-panel {
+        position: relative;
+        z-index: 1;
+        max-width: 460px;
+        width: 100%;
+        margin: 30px auto 0;
+      }
+
       #landing-auth label {
         display: block;
+        text-align: center;
         font-size: 12px;
         font-weight: 600;
         color: rgba(255, 255, 255, 0.82);
@@ -52,8 +211,8 @@
         width: 100%;
         margin-top: 10px;
         padding: 14px 14px;
-        border-radius: 12px;
-        border: 1px solid #232323;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.1);
         background: #1a1a1a;
         color: #fff;
         outline: none;
@@ -61,39 +220,69 @@
       }
       #landing-auth input:focus {
         border-color: #00d4c8;
-        box-shadow: 0 0 0 3px rgba(0, 212, 200, 0.16);
+        box-shadow: 0 6px 20px rgba(0, 212, 200, 0.08);
       }
       #landing-auth button.primary {
         width: 100%;
-        padding: 13px 14px;
-        border-radius: 12px;
+        padding: 14px 16px;
+        border-radius: 10px;
         border: 0;
-        margin-top: 16px;
-        background: #00d4c8;
-        color: #041010;
-        font-weight: 700;
+        margin-top: 18px;
+        background: #ffffff;
+        color: #111111;
+        font-weight: 800;
         cursor: pointer;
       }
-      #landing-auth button.switch {
-        width: 100%;
+      #landing-auth .auth-note {
         margin-top: 12px;
-        background: transparent;
-        border: 0;
-        color: #9e9e9e;
-        text-decoration: underline;
-        cursor: pointer;
-        padding: 8px 0 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #888888;
+        text-align: center;
       }
+      #landing-auth .meta-row { display:none; }
+      #landing-auth button.switch { display:none; }
       #landing-auth .msg {
         font-size: 13px;
         color: #f4dcdc;
         margin-top: 10px;
         min-height: 18px;
+        text-align: center;
       }
       #landing-auth .hidden { display: none; }
       @media (max-width: 900px) {
-        #landing-auth-wrap { padding: 72px 16px 96px; }
-        #landing-auth { max-width: 100%; }
+        #landing-auth-wrap { padding: 80px 16px; }
+        #landing-auth .auth-grid {
+          grid-template-columns: 1fr;
+          max-width: 100%;
+        }
+        #landing-auth .auth-left-heading {
+          max-width: 100%;
+          font-size: 30px;
+        }
+        #landing-auth .auth-stats {
+          grid-template-columns: 1fr;
+        }
+        #landing-auth .auth-card-head {
+          flex-direction: column;
+        }
+        #landing-auth .auth-tabs {
+          align-self: flex-start;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        #landing-auth .auth-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+
+        #landing-auth .auth-card {
+          min-height: 620px;
+        }
+
+        #landing-auth .auth-card-right .auth-panel {
+          margin-top: 36px;
+        }
       }
     </style>
 
@@ -101,20 +290,62 @@
 
     <div id="landing-auth-wrap">
       <div id="landing-auth">
-        <div id="auth-title" class="title">Sign In</div>
+        <div class="auth-grid">
+          <div class="auth-card auth-card-left">
+            <div>
+              <span class="auth-badge">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V6Zm1 8.73V16h2v-1.27a2 2 0 1 0-2 0Z"/></svg>
+                Inline Auth Flow
+              </span>
+              <div class="auth-left-heading">Sign in or create an account without leaving the landing page.</div>
+              <p class="auth-left-copy">Use the same backend login flow from the landing page and keep the session ready as soon as authentication completes.</p>
+            </div>
 
-        <label id="org-label" class="hidden" for="auth-org">Organization Name</label>
-        <input id="auth-org" class="hidden" type="text" placeholder="Acme Corp" autocomplete="organization" />
+            <div class="auth-stats">
+              <div class="stat-item">
+                <div class="stat-label">No redirect</div>
+                <div class="stat-desc">stay-on-page auth flow</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Session ready</div>
+                <div class="stat-desc">token stored instantly</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Switch modes</div>
+                <div class="stat-desc">signin or registration</div>
+              </div>
+            </div>
+          </div>
 
-        <label for="auth-email">Email</label>
-        <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
+          <div class="auth-card auth-card-right">
+            <div class="auth-card-head">
+              <div>
+                <span class="section-label">Workspace Access</span>
+                <div id="auth-title" class="title">Welcome back</div>
+              </div>
 
-        <label for="auth-password">Password</label>
-        <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+              <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+                <button id="auth-tab-signin" class="auth-tab active" type="button">Sign In</button>
+                <button id="auth-tab-signup" class="auth-tab" type="button">Sign Up</button>
+              </div>
+            </div>
 
-        <button id="auth-submit" class="primary">Sign In</button>
-        <button class="switch" id="auth-toggle" type="button">Create account</button>
-        <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
+            <div class="auth-panel">
+              <label id="org-label" class="hidden" for="auth-org">Organization Name</label>
+              <input id="auth-org" class="hidden" type="text" placeholder="Acme Corp" autocomplete="organization" />
+
+              <label for="auth-email">Email</label>
+              <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+              <label for="auth-password">Password</label>
+              <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+              <button id="auth-submit" class="primary">Sign In</button>
+              <div class="auth-note" id="auth-note">No redirect. Your session is ready the moment sign in completes.</div>
+              <div class="msg" id="auth-msg" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -127,31 +358,36 @@
         const email = document.getElementById('auth-email');
         const pass = document.getElementById('auth-password');
         const submit = document.getElementById('auth-submit');
-        const toggle = document.getElementById('auth-toggle');
+        const tabSignin = document.getElementById('auth-tab-signin');
+        const tabSignup = document.getElementById('auth-tab-signup');
         const title = document.getElementById('auth-title');
         const msg = document.getElementById('auth-msg');
+        const note = document.getElementById('auth-note');
 
         function setLoading(v){
           submit.disabled = v;
-          toggle.disabled = v;
+          tabSignin.disabled = v;
+          tabSignup.disabled = v;
           org.disabled = v;
           email.disabled = v;
           pass.disabled = v;
         }
 
         function renderMode(){
-          title.textContent = isRegister ? 'Create account' : 'Sign In';
+          title.textContent = isRegister ? 'Create your account' : 'Welcome back';
           submit.textContent = isRegister ? 'Register' : 'Sign In';
-          toggle.textContent = isRegister ? 'Have an account? Sign in' : 'Create account';
+          tabSignin.classList.toggle('active', !isRegister);
+          tabSignup.classList.toggle('active', isRegister);
+          note.textContent = isRegister
+            ? 'Create your workspace account and keep going without leaving the page.'
+            : 'No redirect. Your session is ready the moment sign in completes.';
           org.classList.toggle('hidden', !isRegister);
           orgLabel.classList.toggle('hidden', !isRegister);
           msg.textContent = '';
         }
 
-        toggle.addEventListener('click', ()=>{
-          isRegister = !isRegister;
-          renderMode();
-        });
+        tabSignin.addEventListener('click', ()=>{ isRegister = false; renderMode(); });
+        tabSignup.addEventListener('click', ()=>{ isRegister = true; renderMode(); });
 
         submit.addEventListener('click', async ()=>{
           const e = (email.value || '').trim();
@@ -236,24 +472,26 @@
 
     <script>
       (function () {
-        const root = document.getElementById('root');
         const authWrap = document.getElementById('landing-auth-wrap');
-        if (!root || !authWrap) return;
+        if (!authWrap) return;
 
-        const moveAuthIntoLayout = () => {
-          const footer = root.querySelector('footer');
+        const moveAuthBeforeFooter = () => {
+          const footer = document.querySelector('footer');
           if (!footer) return false;
-          if (authWrap.parentElement !== root || authWrap.nextElementSibling !== footer) {
-            root.insertBefore(authWrap, footer);
+          const footerParent = footer.parentElement || document.body;
+
+          if (authWrap.parentElement !== footerParent || authWrap.nextElementSibling !== footer) {
+            footerParent.insertBefore(authWrap, footer);
           }
           return true;
         };
 
         const scheduleMove = () => {
-          if (moveAuthIntoLayout()) return;
+          if (moveAuthBeforeFooter()) return;
           requestAnimationFrame(scheduleMove);
         };
 
+        // Try immediately, then keep retrying until footer appears
         scheduleMove();
       })();
     </script>

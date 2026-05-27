@@ -1,8 +1,9 @@
-'use client';
+ 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useDriftEvents } from '@/lib/hooks';
+import { useSearchParams } from 'next/navigation';
+import { useDriftEvents, useBehaviorUnits } from '@/lib/hooks';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -12,8 +13,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function DriftPage() {
   const [severity, setSeverity] = useState<string>('');
   const [resolved, setResolved] = useState<string>('');
+
+  const searchParams = useSearchParams();
+  const projectParam = searchParams?.get('project') ?? '';
+
+  // Load units to resolve a project name to a unit id
+  const { data: units } = useBehaviorUnits();
+  const matchedUnit = units?.find((u: any) => u.name === projectParam || u.slug === projectParam);
+  const unit_id = matchedUnit?.id;
+
   const { data: events, isLoading } = useDriftEvents({
     severity: severity || undefined,
+    unit_id: unit_id || undefined,
     resolved: resolved === 'true' ? true : resolved === 'false' ? false : undefined,
   });
 
