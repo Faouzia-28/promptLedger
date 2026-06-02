@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
-    LLM_PROVIDER: str = "ollama"
+    # Prefer Groq (grok) by default in hosted environments where Ollama isn't available
+    LLM_PROVIDER: str = "grok"
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama-3.1-8b-instant"
