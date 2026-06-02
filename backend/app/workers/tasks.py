@@ -88,7 +88,25 @@ def run_regression_eval(eval_run_id: str):
 		for i, case in enumerate(cases):
 			try:
 				# Run version with input
-				content = version.content if isinstance(version.content, dict) else json.loads(version.content or '{}')
+				raw_version_content = version.content
+				# Robustly parse stored version content: it may be JSON, may include
+				# trailing debug text, or may be a plain instruction string.
+				if isinstance(raw_version_content, dict):
+					content = raw_version_content
+				else:
+					try:
+						content = json.loads(raw_version_content or '{}')
+					except Exception:
+						# Try to extract a JSON-like substring if the full payload isn't valid JSON
+						import re
+						m = re.search(r"\{[\s\S]*\}", raw_version_content or "")
+						if m:
+							try:
+								content = json.loads(m.group())
+							except Exception:
+								content = {}
+						else:
+							content = {}
 
 				# Validate prompt content to avoid running model against config-like payloads
 				invalid, invalid_msg = validate_prompt_content(content)
@@ -104,8 +122,17 @@ def run_regression_eval(eval_run_id: str):
 					run.completed_at = datetime.now(timezone.utc)
 					db.commit()
 					return {"status": "failed", "score": 0.0, "error": invalid_msg}
-				system_prompt = content.get('system_prompt') or content.get('system_message', '')
-				user_template = content.get('prompt') or content.get('user_prompt', '{input}')
+				# Prefer explicit user prompt template keys when present. Some stored
+				# version content may be a model configuration dict (with keys like
+				# 'name'/'model' and 'user_prompt_template'). Use the template when
+				# available; otherwise fall back to common keys.
+				if isinstance(content, dict) and (('name' in content or 'model' in content) and (
+					'userid' in content or 'user_prompt_template' in content or 'user_prompt' in content or 'prompt' in content)):
+					system_prompt = content.get('system_prompt') or content.get('system_message', '')
+					user_template = content.get('user_prompt_template') or content.get('user_prompt') or content.get('prompt') or '{input}'
+				else:
+					system_prompt = content.get('system_prompt') or content.get('system_message', '') if isinstance(content, dict) else ''
+					user_template = content.get('prompt') or content.get('user_prompt', '{input}') if isinstance(content, dict) else '{input}'
 				
 				# Replace {{input}} or {input} with actual input
 				user_message = user_template.replace('{{input}}', case.get('input', ''))
