@@ -23,3 +23,15 @@ venv/
 frontend/public/local-preview.html
 scripts/setup-local-db.ps1
 scripts/start-local-demo.ps1
+
+# Cleanup artifacts from EC2 and migration work
+terraform.tfvars
+promptledger_deploy
+deploy_key_unix
+terraform.exe
+terraform.zip
+claude_handoff.zip
+frontend_public_deploy.zip
+promptledger.zip
+tmp_payload*.json
+tmp_update_main.py
